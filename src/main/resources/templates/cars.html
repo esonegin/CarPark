@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cars</title>
+</head>
+<body>
+<h1>Список машин</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Пробег</th>
+        <th>Год выпуска</th>
+        <th>Запас хода</th>
+    </tr>
+    <tr th:each="car : ${cars}">
+        <td th:text="${car.getCar_id()}">ID</td>
+        <td th:text="${car.getMileage()}">Пробег</td>
+        <td th:text="${car.getГод_выпуска()}">Год выпуска</td>
+        <td th:text="${car.getReserve()}">Запас хода</td>
+    </tr>
+</table>
+</body>
+</html>
