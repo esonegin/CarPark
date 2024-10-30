@@ -11,12 +11,16 @@
         <th>Пробег</th>
         <th>Год выпуска</th>
         <th>Запас хода</th>
+        <th>Номер</th>
+        <th>Брэнд</th>
     </tr>
     <tr th:each="car : ${cars}">
         <td th:text="${car.getCar_id()}">ID</td>
         <td th:text="${car.getMileage()}">Пробег</td>
         <td th:text="${car.getГод_выпуска()}">Год выпуска</td>
         <td th:text="${car.getReserve()}">Запас хода</td>
+        <td th:text="${car.getNumber()}">Номер</td>
+        <td th:text="${car.brand.getBrand_name()}">Брэнд</td>
     </tr>
 </table>
 </body>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новая машина</title>
+</head>
+<body>
+
+<form th:action="@{/cars/save}" th:object="${car}" method="post">
+    <label for="mileage">Введите пробег: </label>
+    <input type="text" th:field="*{mileage}" id="mileage"/>
+    <div style="color:red" th:if="${#fields.hasErrors('mileage')}" th:errors="*{mileage}">Mileage Error</div>
+    <br/>
+
+    <label for="год_выпуска">Введите год выпуска: </label>
+    <input type="text" th:field="*{год_выпуска}" id="год_выпуска"/>
+    <div style="color:red" th:if="${#fields.hasErrors('год_выпуска')}" th:errors="*{год_выпуска}">Год выпуска Error</div>
+    <br/>
+
+    <label for="reserve">Введите запас хода: </label>
+    <input type="text" th:field="*{reserve}" id="reserve"/>
+    <div style="color:red" th:if="${#fields.hasErrors('reserve')}" th:errors="*{reserve}">Запас хода Error</div>
+    <br/>
+
+    <label for="number">Введите номер автомобиля: </label>
+    <input type="text" th:field="*{number}" id="number"/>
+    <div style="color:red" th:if="${#fields.hasErrors('number')}" th:errors="*{number}">Номер автомобиля Error</div>
+    <br/>
+
+    <label for="brand">Выберите бренд:</label>
+    <select name="brandId" id="brand">
+        <option th:each="brand : ${brands}" th:value="${brand.getBrand_id()}" th:text="${brand.getBrand_name()}"></option>
+    </select>
+    <br/>
+
+    <input type="submit" value=" Создать!"/>
+</form>
+
+</body>
+</html>

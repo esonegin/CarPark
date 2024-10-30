@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cars</title>
+</head>
+<body>
+<h1>Список брэндов</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название брэнда</th>
+        <th>Емкость бака</th>
+        <th>Грузоподъемность</th>
+        <th>Количество мест</th>
+    </tr>
+    <tr th:each="brand : ${brands}">
+        <td th:text="${brand.getBrand_id()}">ID</td>
+        <td th:text="${brand.getBrand_name()}">Название брэнда</td>
+        <td th:text="${brand.getTank_volume()}">Емкость бака</td>
+        <td th:text="${brand.getLifting_capacity()}">Грузоподъемность</td>
+        <td th:text="${brand.getSeats()}">Количество мест</td>
+    </tr>
+</table>
+</body>
+</html>

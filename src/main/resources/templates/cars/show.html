@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Автомобиль</title>
+</head>
+<body>
+<p th:text="${'ID: ' + car.getCar_id()}">VALUE</p>
+<p th:text="${'Пробег: ' + car.getMileage()}">VALUE</p>
+<p th:text="${'Год выпуска: ' + car.getГод_выпуска()}">VALUE</p>
+<p th:text="${'Запас хода: ' + car.getReserve()}">VALUE</p>
+<p th:text="${'Номер: ' + car.getNumber()}">VALUE</p>
+<p th:text="${'Бренд: ' + car.getBrand().getBrand_name}">VALUE</p>
+
+
+<a th:href="@{/cars/{id}/edit(id=${car.getCar_id()})}">Редактировать</a>
+
+<form th:method="DELETE" th:action="@{/cars/{id}(id=${car.getCar_id()})}">
+    <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>

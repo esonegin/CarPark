@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование автомобилей</title>
+</head>
+<body>
+
+<form th:method="PATCH" th:action="@{/cars/{id}(id=${car.getCar_id()})}" th:object="${car}">
+    <input type="hidden" name="_method" value="patch">
+    <label for="mileage">Введите пробег автомобиля: </label>
+    <input type="text" th:field="*{mileage}" id="mileage"/>
+    <div style="color:red" th:if="${#fields.hasErrors('mileage')}" th:errors="*{mileage}">mileage Error</div>
+    <br/>
+
+    <label for="год_выпуска">Введите год выпуска автомобиля: </label>
+    <input type="text" th:field="*{год_выпуска}" id="год_выпуска"/>
+    <div style="color:red" th:if="${#fields.hasErrors('год_выпуска')}" th:errors="*{год_выпуска}">год_выпуска Error</div>
+    <br/>
+
+    <label for="reserve">Введите запас хода автомобиля: </label>
+    <input type="text" th:field="*{reserve}" id="reserve"/>
+    <div style="color:red" th:if="${#fields.hasErrors('reserve')}" th:errors="*{reserve}">reserve Error</div>
+    <br/>
+
+    <label for="number">Введите номер автомобиля: </label>
+    <input type="text" th:field="*{number}" id="number"/>
+    <div style="color:red" th:if="${#fields.hasErrors('number')}" th:errors="*{number}">number Error</div>
+    <br/>
+
+    <label for="brand">Выберите бренд:</label>
+    <select name="brandId" id="brand">
+        <option th:each="brand : ${brands}" th:value="${brand.getBrand_id()}" th:text="${brand.getBrand_name()}"></option>
+    </select>
+    <br/>
+
+    <input type="submit" value="Применить"/>
+</form>
+
+</body>
+</html>
