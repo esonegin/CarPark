@@ -29,7 +29,13 @@
 
     <label for="brand">Выберите бренд:</label>
     <select name="brandId" id="brand">
-        <option th:each="brand : ${brands}" th:value="${brand.getBrand_id()}" th:text="${brand.getBrand_name()}"></option>
+        <option th:each="brand : ${brands}" th:value="${brand.getId()}" th:text="${brand.getName()}"></option>
+    </select>
+    <br/>
+
+    <label for="enterprise">Выберите предприятие:</label>
+    <select name="enterprise_id" id="enterprise">
+        <option th:each="enterprise : ${enterprises}" th:value="${enterprise.getId()}" th:text="${enterprise.getName()}"></option>
     </select>
     <br/>
 

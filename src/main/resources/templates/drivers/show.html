@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Водитель</title>
+</head>
+<body>
+<p th:text="${'ID: ' + driver.getId()}">VALUE</p>
+<p th:text="${'Имя водителя: ' + driver.getName()}">VALUE</p>
+<p th:text="${'Зарплата водителя: ' + driver.getSalary()}">VALUE</p>
+
+
+<a th:href="@{/drivers/{id}/edit(id=${driver.getId()})}">Редактировать</a>
+
+<form th:method="DELETE" th:action="@{/drivers/{id}(id=${driver.getId()})}">
+    <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Менеджер</title>
+</head>
+<body>
+<h1>Информация о менеджере</h1>
+<p th:text="${'ID: ' + manager.getId()}">VALUE</p>
+<p th:text="${'Имя менеджера: ' + manager.getUsername()}">VALUE</p>
+<p th:text="${'Зарплата менеджера: ' + manager.getSalary()}">VALUE</p>
+
+<h2>Предприятия</h2>
+
+<div id="enterprises">
+    <ul th:each="enterprise : ${enterprises}">
+        <li th:text="${enterprise.getName()}">Enterprise Name</li>
+    </ul>
+</div>
+
+<a th:href="@{/managers/{id}/edit(id=${manager.getId()})}">Редактировать</a>
+
+<a th:href="@{/managers/{id}/assignEnterprise(id=${manager.getId()})}">Назначить предприятие</a>
+
+
+
+<form th:method="DELETE" th:action="@{/managers/{id}(id=${manager.getId()})}">
+    <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый водитель</title>
+</head>
+<body>
+
+<form th:action="@{/drivers/save}" th:object="${driver}" method="post">
+    <label for="name">Введите имя водителя: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Имя водителя Error</div>
+    <br/>
+
+    <label for="salary">Введите зарплату водителя водителя: </label>
+    <input type="text" th:field="*{salary}" id="salary"/>
+    <div style="color:red" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}">Зарплата водителя Error</div>
+    <br/>
+
+    <input type="submit" value=" Создать!"/>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Список водителей</title>
+</head>
+<body>
+<h1>Список водителей</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Имя водителя</th>
+        <th>Зарплата</th>
+        <th>Машины</th>
+        <th>Активная машина</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="driver : ${drivers}">
+        <td th:text="${driver.getId()}"></td>
+        <td th:text="${driver.getName()}"></td>
+        <td th:text="${driver.getSalary()}"></td>
+        <td>
+            <ul>
+                <li th:each="car : ${driver.getCars()}" th:text="${car.getBrand().getName()}"></li>
+            </ul>
+        </td>
+        <!--<td>
+                    <span th:if="${driver.getActiveCar() != null}">
+                        <strong th:text="${driver.getActiveCar().getBrand().getBrand_name()}"></strong> (активная)
+                    </span>
+            <span th:if="${driver.getActiveCar() == null}">
+                        Нет активной машины
+                    </span>
+        </td>-->
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/drivers/new}">Создать нового водителя</a>
+</body>
+</html>

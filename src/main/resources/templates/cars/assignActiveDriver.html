@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Назначить активного водителя</title>
+</head>
+<body>
+<h1>Назначить активного водителя для машины</h1>
+
+<form th:action="@{/cars/{id}/assignActiveDriver(id=${car.getCarId()})}" method="post">
+    <label for="driverId">Выберите водителя:</label>
+    <select id="driverId" name="driverId" required>
+        <option th:each="driver : ${assignedDrivers}"
+                th:value="${driver.getId()}"
+                th:text="${driver.getName()}"></option>
+    </select>
+    <button type="submit">Назначить активного водителя</button>
+</form>
+
+
+
+
+<a href="/cars">Назад к списку машин</a>
+</body>
+</html>

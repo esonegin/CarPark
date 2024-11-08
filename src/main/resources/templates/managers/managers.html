@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Менеджеры</title>
+</head>
+<body>
+<h1>Список менеджеров</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Имя менеджера</th>
+        <th>Зарплата менеджера</th>
+    </tr>
+    <tr th:each="manager : ${managers}">
+        <td th:text="${manager.getId()}">ID</td>
+        <td th:text="${manager.getUsername()}">Имя менеджера</td>
+        <td th:text="${manager.getSalary()}">Зарплата менеджера</td>
+    </tr>
+</table>
+<a th:href="@{/managers/new}">Создать нового менеджера</a>
+</body>
+</html>

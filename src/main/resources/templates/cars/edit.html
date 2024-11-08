@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<form th:method="PATCH" th:action="@{/cars/{id}(id=${car.getCar_id()})}" th:object="${car}">
+<form th:method="PATCH" th:action="@{/cars/{id}(id=${car.getCarId()})}" th:object="${car}">
     <input type="hidden" name="_method" value="patch">
     <label for="mileage">Введите пробег автомобиля: </label>
     <input type="text" th:field="*{mileage}" id="mileage"/>
@@ -30,7 +30,7 @@
 
     <label for="brand">Выберите бренд:</label>
     <select name="brandId" id="brand">
-        <option th:each="brand : ${brands}" th:value="${brand.getBrand_id()}" th:text="${brand.getBrand_name()}"></option>
+        <option th:each="brand : ${brands}" th:value="${brand.getId()}" th:text="${brand.getName()}"></option>
     </select>
     <br/>
 

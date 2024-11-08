@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Предприятия</title>
+</head>
+<body>
+<h1>Список предприятий</h1>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название предприятия</th>
+        <th>Город нахождения предприятия</th>
+        <th>Машины</th>
+        <th>Водители</th>
+
+    </tr>
+    <tr th:each="enterprise : ${enterprises}">
+        <td th:text="${enterprise.getId()}">ID</td>
+        <td th:text="${enterprise.getName()}">Название предприятия</td>
+        <td th:text="${enterprise.getCity()}">Город нахождения предприятия</td>
+
+        <td>
+            <ul>
+                <li th:each="car : ${enterprise.getCars()}" th:text="${car != null ? car.getBrand().getName() : 'Нет автомобилей'}"></li>
+            </ul>
+        </td>
+
+        <td>
+            <ul>
+                <li th:each="driver : ${enterprise.getDrivers()}" th:text="${driver.getName()}"></li>
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<a th:href="@{/enterprises/new}">Создать новое предприятие</a>
+
+</body>
+</html>

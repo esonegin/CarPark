@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Enterprise to Manager</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<h2>Assign Enterprise to Manager</h2>
+
+<form th:action="@{/assignEnterprise}" method="post">
+    <p th:text="${'Имя менеджера: ' + manager.getUsername()}">VALUE</p>
+
+    <div>
+        <label for="id">Выберите предприятие:</label>
+        <select id="id" name="id" th:field="*{id}">
+            <option th:each="enterprise : ${availableEnterprises}"
+                    th:value="${enterprise.getId()}"
+                    th:text="${enterprise.getName()}">Enterprise</option>
+        </select>
+    </div>
+
+    <div>
+        <button type="submit">Assign</button>
+    </div>
+</form>
+
+</body>
+</html>

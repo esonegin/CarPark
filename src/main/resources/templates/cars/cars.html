@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Cars</title>
+    <title>Автомобили</title>
 </head>
 <body>
 <h1>Список машин</h1>
@@ -13,15 +13,22 @@
         <th>Запас хода</th>
         <th>Номер</th>
         <th>Брэнд</th>
+        <th>Активный водитель</th>
+        <th>Предприятие</th>
     </tr>
     <tr th:each="car : ${cars}">
-        <td th:text="${car.getCar_id()}">ID</td>
+        <td th:text="${car.getCarId()}">ID</td>
         <td th:text="${car.getMileage()}">Пробег</td>
         <td th:text="${car.getГод_выпуска()}">Год выпуска</td>
         <td th:text="${car.getReserve()}">Запас хода</td>
         <td th:text="${car.getNumber()}">Номер</td>
-        <td th:text="${car.brand.getBrand_name()}">Брэнд</td>
+        <td th:text="${car.brand.getName()}">Брэнд</td>
+        <td th:text="${car.getActiveDriver() != null ? car.getActiveDriver().getName() : 'None'}">Активный водитель</td>
+        <td th:text="${car.getEnterprise().getName()}">Предприятие</td>
     </tr>
 </table>
+
+<a th:href="@{/cars/new}">Создать новый автомобиль</a>
+
 </body>
 </html>

@@ -15,13 +15,13 @@ public class Brand {
     @Id
     @Column(name = "brand_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int brand_id;
+    private int id;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Car> cars;
 
-    @Column(name = "brand_name")
-    private String brand_name;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "tank_volume")
     private int tank_volume;
@@ -32,20 +32,28 @@ public class Brand {
     @Column(name = "seats")
     private int seats;
 
-    public int getBrand_id() {
-        return brand_id;
+    public int getId() {
+        return id;
     }
 
-    public void setBrand_id(int brand_id) {
-        this.brand_id = brand_id;
+    public void setId(int brand_id) {
+        this.id = id;
     }
 
-    public String getBrand_name() {
-        return brand_name;
+    public List<Car> getCars() {
+        return cars;
     }
 
-    public void setBrand_name(String brand_name) {
-        this.brand_name = brand_name;
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getTank_volume() {

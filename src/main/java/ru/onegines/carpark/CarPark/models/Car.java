@@ -1,6 +1,10 @@
 package ru.onegines.carpark.CarPark.models;
 
+
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author onegines
@@ -9,18 +13,10 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "cars")
 public class Car {
-    public Car() {
-    }
-
-    public Car(Integer mileage, Brand brand) {
-        this.mileage = mileage;
-        this.brand = brand;
-    }
-
     @Id
-    @Column(name = "car_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int car_id;
+    @Column(name = "car_id")
+    private Long carId;
 
     @Column(name = "mileage")
     private int mileage;
@@ -38,12 +34,38 @@ public class Car {
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    public int getCar_id() {
-        return car_id;
+    @ManyToOne
+    @JoinColumn(name = "enterprise_id", nullable = false) // Столбец для внешнего ключа
+    private Enterprise enterprise;
+
+    @ManyToMany
+    @JoinTable(
+            name = "car_drivers",
+            joinColumns = @JoinColumn(name = "car_id"),
+            inverseJoinColumns = @JoinColumn(name = "driver_id")
+    )
+    private Set<Driver> drivers = new HashSet<>();
+
+
+    // Поле для хранения активного водителя
+    @OneToOne
+    @JoinColumn(name = "active_driver_id")
+    private Driver activeDriver;
+
+    public Car() {
     }
 
-    public void setCar_id(int car_id) {
-        this.car_id = car_id;
+    public Car(Integer mileage, Brand brand) {
+        this.mileage = mileage;
+        this.brand = brand;
+    }
+
+    public Long getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Long carId) {
+        this.carId = carId;
     }
 
     public int getMileage() {
@@ -86,15 +108,42 @@ public class Car {
         this.number = number;
     }
 
+    public Enterprise getEnterprise() {
+        return enterprise;
+    }
 
+    public void setEnterprise(Enterprise enterprise) {
+        this.enterprise = enterprise;
+    }
+
+    public Set<Driver> getDrivers() {
+        return drivers;
+    }
+
+    public void setDrivers(Set<Driver> drivers) {
+        this.drivers = drivers;
+    }
+
+    public Driver getActiveDriver() {
+        return activeDriver;
+    }
+
+    public void setActiveDriver(Driver activeDriver) {
+        this.activeDriver = activeDriver;
+    }
 
     @Override
     public String toString() {
         return "Car{" +
-                "car_id=" + car_id +
+                "carId=" + carId +
                 ", mileage=" + mileage +
                 ", год_выпуска=" + год_выпуска +
                 ", reserve=" + reserve +
+                ", number='" + number + '\'' +
+                ", brand=" + brand +
+                ", enterprise=" + enterprise +
+                ", drivers=" + drivers +
+                ", activeDriver=" + activeDriver +
                 '}';
     }
 }

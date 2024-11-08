@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Предприятие</title>
+</head>
+<body>
+<h1>Информация о предприятии</h1>
+<p th:text="${'ID: ' + enterprise.getId()}">VALUE</p>
+<p th:text="${'Название предприятия: ' + enterprise.getName()}">VALUE</p>
+<p th:text="${'Город нахождения предприятия: ' + enterprise.getCity()}">VALUE</p>
+
+<h2>Автомобили</h2>
+<ul>
+    <li th:each="car : ${enterprise.getCars()}">
+        Модель: <span th:text="${car.getBrand().getName()}"></span>
+    </li>
+</ul>
+
+<h2>Водители</h2>
+<ul>
+    <li th:each="driver : ${enterprise.getDrivers()}">
+        Имя: <span th:text="${driver.getName()}"></span>
+    </li>
+</ul>
+
+
+<a th:href="@{/enterprises/{id}/edit(id=${enterprise.getId()})}">Редактировать</a>
+
+<a th:href="@{/enterprises/{id}/assignCars(id=${enterprise.getId()})}">Назначить автомобиль</a>
+
+<a th:href="@{/enterprises/{id}/assignDrivers(id=${enterprise.getId()})}">Назначить водителя</a>
+
+<form th:method="DELETE" th:action="@{/enterprises/{id}(id=${enterprise.getId()})}">
+    <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>

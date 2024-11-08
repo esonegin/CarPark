@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Привязка автомобилей к предприятию</title>
+</head>
+<body>
+<h1>Предприятие: <span th:text="${enterprise.getName()}"></span></h1>
+
+<form th:action="@{/enterprises/{id}/assignCars(id=${enterprise.getCarId()})}" method="post">
+    <h2>Доступные автомобили</h2>
+    <div th:each="car : ${availableCars}">
+        <input type="checkbox" th:value="${car.getName()}" name="carIds"/>
+        <span th:text="${car.getBrand().getName()}">Бренд</span><br>
+    </div>
+
+    <button type="submit">Привязать автомобили</button>
+</form>
+</body>
+</html>

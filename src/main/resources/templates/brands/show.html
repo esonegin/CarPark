@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Бренд</title>
+</head>
+<body>
+<p th:text="${'ID: ' + brand.getId()}">VALUE</p>
+<p th:text="${'Название бренда: ' + brand.getName()}">VALUE</p>
+<p th:text="${'Вместимость бака: ' + brand.getTank_volume()}">VALUE</p>
+<p th:text="${'Грузоподъемность: ' + brand.getLifting_capacity()}">VALUE</p>
+<p th:text="${'Количество мест: ' + brand.getSeats()}">VALUE</p>
+
+<a th:href="@{/brands/{id}/edit(id=${brand.getId()})}">Редактировать</a>
+
+<form th:method="DELETE" th:action="@{/brands/{id}(id=${brand.getId()})}">
+    <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>

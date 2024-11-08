@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование водителя</title>
+</head>
+<body>
+
+
+<form th:method="PATCH" th:action="@{/drivers/{id}(id=${driver.getId()})}" th:object="${driver}">
+    <input type="hidden" name="_method" value="patch">
+
+    <label for="name">Введите имя водителя: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Имя водителя Error
+    </div>
+    <br/>
+
+    <label for="salary">Введите зарплату водителя: </label>
+    <input type="text" th:field="*{salary}" id="salary"/>
+    <div style="color:red" th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}">Зарплата водителя
+        Error
+    </div>
+    <br/>
+
+    <input type="submit" value="Применить"/>
+</form>
+
+</body>
+</html>

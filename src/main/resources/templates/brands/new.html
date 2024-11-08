@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый бренд</title>
+</head>
+<body>
+
+<form th:action="@{/brands/save}" th:object="${brand}" method="post">
+    <label for="brand_name">Введите название бренда: </label>
+    <input type="text" th:field="*{name}" id="brand_name"/>
+    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Пробег Error</div>
+    <br/>
+
+    <label for="tank_volume">Введите вместимость бака: </label>
+    <input type="text" th:field="*{tank_volume}" id="tank_volume"/>
+    <div style="color:red" th:if="${#fields.hasErrors('tank_volume')}" th:errors="*{tank_volume}">Вместимость бака Error</div>
+    <br/>
+
+    <label for="lifting_capacity">Введите грузоподъемность: </label>
+    <input type="text" th:field="*{lifting_capacity}" id="lifting_capacity"/>
+    <div style="color:red" th:if="${#fields.hasErrors('lifting_capacity')}" th:errors="*{lifting_capacity}">Грузоподъемность Error</div>
+    <br/>
+
+    <label for="seats">Введите количество мест: </label>
+    <input type="text" th:field="*{seats}" id="seats"/>
+    <div style="color:red" th:if="${#fields.hasErrors('seats')}" th:errors="*{seats}">Количество мест Error</div>
+    <br/>
+
+    <input type="submit" value=" Создать!"/>
+</form>
+
+</body>
+</html>
