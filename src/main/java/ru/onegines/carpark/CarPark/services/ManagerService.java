@@ -112,4 +112,10 @@ public class ManagerService {
 
     }
 
+    public Optional<Manager> findByUsername(String username) {
+        return findAll()
+                .stream()
+                .filter(manager -> manager.getUsername().equals(username))
+                .findFirst();
+    }
 }

@@ -25,7 +25,7 @@ public class AuthProviderImpl implements AuthenticationProvider {
         this.managerDetailsService = managerDetailsService;
     }
 
-    @Override
+  /*  @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         UserDetails managerDetails = managerDetailsService.loadUserByUsername(username);
@@ -39,5 +39,28 @@ public class AuthProviderImpl implements AuthenticationProvider {
     @Override
     public boolean supports(Class<?> authentication) {
         return false;
+    }*/
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = authentication.getCredentials().toString();
+        UserDetails managerDetails = managerDetailsService.loadUserByUsername(username);
+        UserDetails user = managerDetailsService.loadUserByUsername(username);
+
+        if (user == null) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+        if(!password.equals(managerDetails.getPassword())){
+            throw new BadCredentialsException("Неверный пароль");
+        }
+        return new UsernamePasswordAuthenticationToken(username, password, user.getAuthorities());
+        // Вставьте логику для проверки пароля и создания аутентификации
+
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
