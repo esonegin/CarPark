@@ -5,9 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.dto.DriverDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
-import ru.onegines.carpark.CarPark.repositories.CarRepository;
 import ru.onegines.carpark.CarPark.repositories.DriverRepository;
-import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,13 +21,13 @@ import java.util.stream.Collectors;
 public class DriverService {
     private final DriverRepository driverRepository;
     private final CarDriverService carDriverService;
-    private final EnterpriseRepository enterpriseRepository;
+    private final EnterpriseService enterpriseService;
 
 
-    public DriverService(DriverRepository driverRepository, CarRepository carRepository, CarDriverService carDriverService, EnterpriseRepository enterpriseRepository) {
+    public DriverService(DriverRepository driverRepository, CarDriverService carDriverService, EnterpriseService enterpriseService) {
         this.driverRepository = driverRepository;
         this.carDriverService = carDriverService;
-        this.enterpriseRepository = enterpriseRepository;
+        this.enterpriseService = enterpriseService;
     }
 
     public Driver findById(long id) {
@@ -91,7 +89,8 @@ public class DriverService {
         return drivers;
     }
 
-/*    public List<Driver> getDriversByVisibleEnterprises(Set<Long> enterprise_ids) {
-        return driverRepository.findByEnterpriseIdIn(enterprise_ids);
-    }*/
+    public boolean isManagerHasAccess(Long managerId, Long id) {
+        Optional<Driver> driver = driverRepository.findById(id);
+        return enterpriseService.isManagerHasAccess(managerId, driver.get().getEnterprise().getId());
+    }
 }

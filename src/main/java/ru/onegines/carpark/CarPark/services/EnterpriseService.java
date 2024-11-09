@@ -1,14 +1,15 @@
 package ru.onegines.carpark.CarPark.services;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.dto.EnterpriseDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.models.Enterprise;
-import ru.onegines.carpark.CarPark.repositories.CarRepository;
-import ru.onegines.carpark.CarPark.repositories.DriverRepository;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
+import ru.onegines.carpark.CarPark.repositories.ManagerRepository;
+import ru.onegines.carpark.CarPark.security.ManagerDetails;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +25,12 @@ import java.util.stream.Collectors;
 public class EnterpriseService {
     private final EnterpriseRepository enterpriseRepository;
     private final DriverService driverService;
+    private final ManagerRepository managerRepository;
 
-    public EnterpriseService(EnterpriseRepository enterpriseRepository, CarRepository carRepository, DriverRepository driverRepository, DriverService driverService) {
+    public EnterpriseService(EnterpriseRepository enterpriseRepository, DriverService driverService, ManagerRepository managerRepository) {
         this.enterpriseRepository = enterpriseRepository;
         this.driverService = driverService;
+        this.managerRepository = managerRepository;
     }
 
     public List<Enterprise> findAll() {
@@ -90,11 +93,14 @@ public class EnterpriseService {
                 .collect(Collectors.toList());
     }
 
-   /* public List<Enterprise> getEnterprisesForManager(Long manager_id) {
-        return enterpriseRepository.findByManagers_Id(manager_id);
-    }*/
-
-    public Set<Enterprise> getEnterprisesByManager(Long managerId) {
+    public Set<Enterprise> getEnterprisesForManager(Long managerId) {
         return enterpriseRepository.findByManagers_Id(managerId);
     }
+
+    public boolean isManagerHasAccess(Long managerId, Long enterpriseId) {
+        return enterpriseRepository.findByManagers_Id(managerId)
+                .stream()
+                .anyMatch(enterprise -> enterprise.getId().equals(enterpriseId));
+    }
+
 }

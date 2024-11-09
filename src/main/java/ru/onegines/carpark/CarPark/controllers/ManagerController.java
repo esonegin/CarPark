@@ -45,7 +45,7 @@ public class ManagerController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") Long id, Model manager) {
-        manager.addAttribute("enterprises", enterpriseService.getEnterprisesByManager(id));
+        manager.addAttribute("enterprises", enterpriseService.getEnterprisesForManager(id));
         manager.addAttribute("manager", managerService.findById(id));
         return "managers/show";
     }

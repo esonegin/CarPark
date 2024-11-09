@@ -1,6 +1,7 @@
 package ru.onegines.carpark.CarPark.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.dto.ManagerDTO;
@@ -10,7 +11,9 @@ import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.models.Manager;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 import ru.onegines.carpark.CarPark.repositories.ManagerRepository;
+import ru.onegines.carpark.CarPark.security.ManagerDetails;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

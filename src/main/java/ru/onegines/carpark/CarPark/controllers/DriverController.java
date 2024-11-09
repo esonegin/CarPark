@@ -1,6 +1,7 @@
 package ru.onegines.carpark.CarPark.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,8 +11,10 @@ import ru.onegines.carpark.CarPark.dto.DriverDTO;
 import ru.onegines.carpark.CarPark.models.Brand;
 import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.repositories.DriverRepository;
+import ru.onegines.carpark.CarPark.security.ManagerDetails;
 import ru.onegines.carpark.CarPark.services.DriverService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,14 +43,20 @@ public class DriverController {
     }
 
     @GetMapping("/{id}")
-    public String getDriverCars(@PathVariable Long id, Model model) {
+    public String getDriverCars(@PathVariable Long id, Model model, Principal principal) {
+        Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
         Optional<Driver> driverOptional = driverService.getDriverWithCars(id);
-        if (driverOptional.isPresent()) {
-            model.addAttribute("driver", driverOptional.get());
-            return "drivers/show"; // Название шаблона
+        if (driverService.isManagerHasAccess(managerId, id)) {
+            if (driverOptional.isPresent()) {
+                model.addAttribute("driver", driverOptional.get());
+                // Название шаблона
+            } else {
+                return "error"; // Шаблон ошибки, если водитель не найден
+            }
         } else {
-            return "error"; // Шаблон ошибки, если водитель не найден
+            return "redirect:/logout";
         }
+        return "drivers/show";
     }
 
     @GetMapping("/new")

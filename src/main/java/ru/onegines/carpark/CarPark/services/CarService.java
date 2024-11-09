@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.dto.CarDTO;
-import ru.onegines.carpark.CarPark.exceptions.DuplicateActiveDriverException;
 import ru.onegines.carpark.CarPark.exceptions.ResourceNotFoundException;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
@@ -13,7 +12,6 @@ import ru.onegines.carpark.CarPark.repositories.DriverRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,13 +24,14 @@ public class CarService {
     private final CarRepository carRepository;
     private final DriverRepository driverRepository;
     private final DriverService driverService;
+    private final EnterpriseService enterpriseService;
 
     @Autowired
-    public CarService(CarRepository carRepository, DriverRepository driverRepository, DriverService driverService) {
-
+    public CarService(CarRepository carRepository, DriverRepository driverRepository, DriverService driverService, EnterpriseService enterpriseService) {
         this.carRepository = carRepository;
         this.driverRepository = driverRepository;
         this.driverService = driverService;
+        this.enterpriseService = enterpriseService;
     }
 
     public List<Car> findAll() {
@@ -112,7 +111,8 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-  /*  public List<Car> getCarsByVisibleEnterprises(Set<Long> enterprise_ids) {
-        return carRepository.findByEnterpriseIn(enterprise_ids);
-    }*/
+    public boolean isManagerHasAccess(Long managerId, Long carId) {
+        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        return enterpriseService.isManagerHasAccess(managerId, car.getEnterprise().getId());
+    }
 }

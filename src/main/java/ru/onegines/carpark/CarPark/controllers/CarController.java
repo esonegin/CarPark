@@ -2,6 +2,7 @@ package ru.onegines.carpark.CarPark.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,9 +15,11 @@ import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.repositories.BrandRepository;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
+import ru.onegines.carpark.CarPark.security.ManagerDetails;
 import ru.onegines.carpark.CarPark.services.CarService;
 import ru.onegines.carpark.CarPark.services.DriverService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -83,10 +86,13 @@ public class CarController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") Long id, Model car) {
-      Set<Driver> assignedDrivers = driverService.findDriversByCarId(id);
-        car.addAttribute("car", carService.findById(id));
-        //car.addAttribute("assigneddrivers", assignedDrivers); // Получить назначенных водителей*/
+    public String show(@PathVariable("id") Long id, Model car, Principal principal) {
+        Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
+        if (carService.isManagerHasAccess(managerId, id)) {
+            car.addAttribute("car", carService.findById(id));
+        } else {
+            return "redirect:/logout";
+        }
         return "cars/show";
     }
 

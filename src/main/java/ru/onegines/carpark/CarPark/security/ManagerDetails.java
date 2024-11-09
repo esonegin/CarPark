@@ -1,10 +1,13 @@
 package ru.onegines.carpark.CarPark.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.onegines.carpark.CarPark.models.Manager;
 
+import java.util.Arrays;
 import java.util.Collection;
+
 
 /**
  * @author onegines
@@ -20,7 +23,7 @@ public class ManagerDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Arrays.asList(new SimpleGrantedAuthority("ROLE_MANAGER"));
     }
 
     @Override

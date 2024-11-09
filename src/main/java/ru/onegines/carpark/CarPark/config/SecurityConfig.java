@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.onegines.carpark.CarPark.security.AuthProviderImpl;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import ru.onegines.carpark.CarPark.services.ManagerDetailsService;
 
 /**
  * @author onegines
@@ -19,22 +20,40 @@ import ru.onegines.carpark.CarPark.security.AuthProviderImpl;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthProviderImpl authProvider;
+
+    /*private final ManagerDetailsService managerDetailsService;
 
     @Autowired
-    public SecurityConfig(AuthProviderImpl authProvider) {
-        this.authProvider = authProvider;
-    }
+    public SecurityConfig(ManagerDetailsService managerDetailsService) {
+        this.managerDetailsService = managerDetailsService;
+    }*/
 
-    // Настраивает аутентификацию
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authProvider);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                //.csrf(csrf -> csrf.disable())
+                .authorizeRequests()
+                .requestMatchers("/auth/login", "/error").permitAll()
+                .requestMatchers("/enterprise/**", "/cars/**", "/drivers/**").hasRole("MANAGER")
+                .anyRequest().authenticated()
+                .and()
+                .formLogin(form -> form
+                        .loginPage("/auth/login") // Указываем кастомную страницу входа
+                        .loginProcessingUrl("/process_login")
+                        .defaultSuccessUrl("/enterprises", true)
+                        .failureUrl("/auth/login?error"))
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                        .logoutSuccessUrl("/auth/login")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"));
+
+
+        return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationProvider(authProvider)  // Регистрируем ваш AuthProvider
-                .build();
+    public PasswordEncoder getPasswordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
     }
 }

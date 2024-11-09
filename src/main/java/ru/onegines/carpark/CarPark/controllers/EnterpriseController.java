@@ -1,6 +1,8 @@
 package ru.onegines.carpark.CarPark.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,11 +18,13 @@ import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.models.Manager;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
+import ru.onegines.carpark.CarPark.security.ManagerDetails;
 import ru.onegines.carpark.CarPark.services.CarService;
 import ru.onegines.carpark.CarPark.services.DriverService;
 import ru.onegines.carpark.CarPark.services.EnterpriseService;
 import ru.onegines.carpark.CarPark.services.ManagerService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +59,13 @@ public class EnterpriseController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model enterprise) {
+    public String show(@PathVariable("id") int id, Model enterprise, Principal principal) {
+        Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
+        if (enterpriseService.isManagerHasAccess(managerId, (long) id)) {
+            enterprise.addAttribute("enterprise", enterpriseService.findById(id));
+        } else {
+            return "redirect:/logout";
+        }
         enterprise.addAttribute("enterprise", enterpriseService.findById(id));
         return "enterprises/show";
     }
