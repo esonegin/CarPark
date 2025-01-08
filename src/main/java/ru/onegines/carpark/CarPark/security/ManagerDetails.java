@@ -7,6 +7,7 @@ import ru.onegines.carpark.CarPark.models.Manager;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -23,7 +24,7 @@ public class ManagerDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_MANAGER"));
+        return Collections.singleton(new SimpleGrantedAuthority(this.manager.getRole()));
     }
 
     @Override
@@ -34,6 +35,11 @@ public class ManagerDetails implements UserDetails {
     @Override
     public String getUsername() {
         return this.manager.getUsername();
+    }
+
+
+    public Long getId() {
+        return this.manager.getId();
     }
 
     @Override

@@ -1,50 +1,60 @@
 package ru.onegines.carpark.CarPark.dto;
 
 
+import ru.onegines.carpark.CarPark.models.Car;
+import ru.onegines.carpark.CarPark.models.Driver;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author onegines
  * @date 03.11.2024
  */
 public class EnterpriseDTO {
-    private Long enterprise_id;
-    private String enterprise_name;// ID бренда
-    private String enterprise_city;
+    private Long enterpriseId;
+    private String enterpriseName;
+    private String enterpriseCity;
     private List<Long> allDriversId;
     private List<Long> allCarsId;
+    private String timeZone;
 
-
-    public EnterpriseDTO(Long enterprise_id, String enterprise_name, String enterprise_city, List<Long> allDriversId, List<Long> allCarsId) {
-        this.enterprise_id = enterprise_id;
-        this.enterprise_name = enterprise_name;
-        this.enterprise_city = enterprise_city;
+    public EnterpriseDTO(Long enterpriseId, String enterpriseName, String enterpriseCity, List<Long> allDriversId, List<Long> allCarsId, String timeZone) {
+        this.enterpriseId = enterpriseId;
+        this.enterpriseName = enterpriseName;
+        this.enterpriseCity = enterpriseCity;
         this.allDriversId = allDriversId;
         this.allCarsId = allCarsId;
+        this.timeZone = timeZone;
     }
 
-    public Long getEnterprise_id() {
-        return enterprise_id;
+
+
+    public EnterpriseDTO(Long id, String name, String city, List<Driver> drivers, Set<Car> cars) {
     }
 
-    public void setEnterprise_id(Long enterprise_id) {
-        this.enterprise_id = enterprise_id;
+    public Long getEnterpriseId() {
+        return enterpriseId;
     }
 
-    public String getEnterprise_name() {
-        return enterprise_name;
+    public void setEnterpriseId(Long enterpriseId) {
+        this.enterpriseId = enterpriseId;
     }
 
-    public void setEnterprise_name(String enterprise_name) {
-        this.enterprise_name = enterprise_name;
+    public String getEnterpriseName() {
+        return enterpriseName;
     }
 
-    public String getEnterprise_city() {
-        return enterprise_city;
+    public void setEnterpriseName(String enterpriseName) {
+        this.enterpriseName = enterpriseName;
     }
 
-    public void setEnterprise_city(String enterprise_city) {
-        this.enterprise_city = enterprise_city;
+    public String getEnterpriseCity() {
+        return enterpriseCity;
+    }
+
+    public void setEnterpriseCity(String enterpriseCity) {
+        this.enterpriseCity = enterpriseCity;
     }
 
     public List<Long> getAllDriversId() {
@@ -62,4 +72,14 @@ public class EnterpriseDTO {
     public void setAllCarsId(List<Long> allCarsId) {
         this.allCarsId = allCarsId;
     }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+
 }

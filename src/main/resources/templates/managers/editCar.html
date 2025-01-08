@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактирование автомобиля</title>
+</head>
+<body>
+<h1>Редактировать автомобиль</h1>
+
+<form th:action="@{/managers/{managerId}/enterprises/{enterpriseId}/cars/{carId}/update(managerId=${managerId}, enterpriseId=${enterpriseId}, carId=${car.carId})}"
+      th:object="${car}" method="post">
+  <label for="mileage">Пробег:</label>
+  <input type="text" th:field="*{mileage}" id="mileage"/>
+  <div style="color:red" th:if="${#fields.hasErrors('mileage')}" th:errors="*{mileage}"></div>
+  <br/>
+
+  <label for="годВыпуска">Год выпуска:</label>
+  <input type="text" th:field="*{годВыпуска}" id="годВыпуска"/>
+  <div style="color:red" th:if="${#fields.hasErrors('годВыпуска')}" th:errors="*{годВыпуска}"></div>
+  <br/>
+
+  <label for="reserve">Запас хода:</label>
+  <input type="text" th:field="*{reserve}" id="reserve"/>
+  <div style="color:red" th:if="${#fields.hasErrors('reserve')}" th:errors="*{reserve}"></div>
+  <br/>
+
+  <label for="number">Номер:</label>
+  <input type="text" th:field="*{number}" id="number"/>
+  <div style="color:red" th:if="${#fields.hasErrors('number')}" th:errors="*{number}"></div>
+  <br/>
+
+  <label for="brand">Бренд:</label>
+  <select name="brandId" id="brand">
+    <option th:each="brand : ${brands}" th:value="${brand.getId()}" th:text="${brand.getName()}"
+            th:selected="${brand.getId()} == ${car.getBrandId()}"></option>
+  </select>
+  <br/>
+
+  <label for="purchaseDateTime">Дата и время создания:</label>
+  <input type="datetime-local" th:field="*{purchaseDateTime}" id="purchaseDateTime"/>
+  <div style="color:red" th:if="${#fields.hasErrors('purchaseDateTime')}" th:errors="*{purchaseDateTime}"></div>
+  <br/>
+
+  <button type="submit">Сохранить</button>
+</form>
+</body>
+</html>

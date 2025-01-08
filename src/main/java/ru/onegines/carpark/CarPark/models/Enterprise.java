@@ -2,6 +2,7 @@ package ru.onegines.carpark.CarPark.models;
 
 import jakarta.persistence.*;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class Enterprise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "enterprise_id")
     private Long id;
 
     @ManyToMany(mappedBy = "enterprises")
@@ -28,12 +29,19 @@ public class Enterprise {
     @Column(name = "city")
     private String city;
 
+    @Column(nullable = true)
+    private String timeZone;
+
     // Один ко многим: предприятию принадлежит несколько автомобилей
-    @OneToMany(mappedBy = "enterprise", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "enterprise")
     private Set<Car> cars;
 
     @OneToMany(mappedBy = "enterprise")
     private List<Driver> drivers;
+
+    public Enterprise() {
+
+    }
 
     public Long getId() {
         return id;
@@ -81,5 +89,17 @@ public class Enterprise {
 
     public void setManagers(Set<Manager> managers) {
         this.managers = managers;
+    }
+
+    public String getTimeZone() {
+        return timeZone != null ? timeZone : "UTC";
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public ZoneId getZoneId() {
+        return ZoneId.of(getTimeZone());
     }
 }

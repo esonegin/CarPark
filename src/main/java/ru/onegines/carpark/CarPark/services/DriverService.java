@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 public class DriverService {
     private final DriverRepository driverRepository;
     private final CarDriverService carDriverService;
-    private final EnterpriseService enterpriseService;
 
 
-    public DriverService(DriverRepository driverRepository, CarDriverService carDriverService, EnterpriseService enterpriseService) {
+
+    public DriverService(DriverRepository driverRepository, CarDriverService carDriverService) {
         this.driverRepository = driverRepository;
         this.carDriverService = carDriverService;
-        this.enterpriseService = enterpriseService;
+
     }
 
     public Driver findById(long id) {
@@ -52,8 +52,8 @@ public class DriverService {
                             driver.getName(),
                             driver.getSalary(),
                             driver.getEnterprise() != null ? driver.getEnterprise().getId() : null, // Проверка на null
-                            carIds/*,
-                            driver.getActiveCar() != null ? driver.getActiveCar().getCar_id() : null*/);
+                            carIds
+                      );
                 })
                 .collect(Collectors.toList());
     }
@@ -89,8 +89,8 @@ public class DriverService {
         return drivers;
     }
 
-    public boolean isManagerHasAccess(Long managerId, Long id) {
+ /*   public boolean isManagerHasAccess(Long managerId, Long id) {
         Optional<Driver> driver = driverRepository.findById(id);
         return enterpriseService.isManagerHasAccess(managerId, driver.get().getEnterprise().getId());
-    }
+    }*/
 }

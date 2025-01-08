@@ -22,8 +22,7 @@ import java.util.Optional;
  * @author onegines
  * @date 01.11.2024
  */
-@Controller
-
+@RestController
 @ControllerAdvice
 @RequestMapping("/drivers")
 public class DriverController {
@@ -46,13 +45,13 @@ public class DriverController {
     public String getDriverCars(@PathVariable Long id, Model model, Principal principal) {
         Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
         Optional<Driver> driverOptional = driverService.getDriverWithCars(id);
-        if (driverService.isManagerHasAccess(managerId, id)) {
+        //if (driverService.isManagerHasAccess(managerId, id)) {
             if (driverOptional.isPresent()) {
                 model.addAttribute("driver", driverOptional.get());
                 // Название шаблона
-            } else {
+           /* } else {
                 return "error"; // Шаблон ошибки, если водитель не найден
-            }
+            }*/
         } else {
             return "redirect:/logout";
         }

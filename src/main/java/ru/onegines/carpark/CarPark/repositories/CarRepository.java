@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -12,4 +13,6 @@ import java.util.Set;
 public interface CarRepository extends JpaRepository<Car, Long> {
 
     List<Car> findByEnterpriseIn(Set<Enterprise> enterprises);
+
+    List<Car> findByEnterpriseId(Long enterpriseId);
 }

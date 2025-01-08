@@ -3,35 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>Автомобиль</title>
+    <script>
+        // Функция для получения данных автомобиля и их отображения
+        function fetchCarData(id) {
+            fetch(`/cars/${id}`)
+                .then(response => response.json())  // Получаем JSON-ответ
+                .then(data => {
+                    if (data) {
+                        // Заполняем страницу полученными данными
+                        document.getElementById("carId").innerText = 'ID: ' + data.carId;
+                        document.getElementById("mileage").innerText = 'Пробег: ' + data.mileage;
+                        document.getElementById("year").innerText = 'Год выпуска: ' + data.year;
+                        document.getElementById("reserve").innerText = 'Запас хода: ' + data.reserve;
+                        document.getElementById("number").innerText = 'Номер: ' + data.number;
+                        document.getElementById("brand").innerText = 'Бренд: ' + data.brand.name;
+
+                        // Добавляем водителей
+                        let driversList = document.getElementById("drivers");
+                        driversList.innerHTML = '';  // Очистить текущий список
+                        data.drivers.forEach(driver => {
+                            let listItem = document.createElement("li");
+                            listItem.innerText = driver.name;
+                            driversList.appendChild(listItem);
+                        });
+
+                        // Отображаем активного водителя
+                        document.getElementById("activeDriver").innerText = data.activeDriver ? data.activeDriver.name : 'None';
+                    } else {
+                        alert('Car not found');
+                    }
+                })
+                .catch(error => console.error('Error fetching car data:', error));
+        }
+
+        // Вызовем fetchCarData для получения данных с id = 1, например
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchCarData(1); // Замените 1 на нужный id
+        });
+    </script>
 </head>
 <body>
-<p th:text="${'ID: ' + car.getCarId()}">VALUE</p>
-<p th:text="${'Пробег: ' + car.getMileage()}">VALUE</p>
-<p th:text="${'Год выпуска: ' + car.getГод_выпуска()}">VALUE</p>
-<p th:text="${'Запас хода: ' + car.getReserve()}">VALUE</p>
-<p th:text="${'Номер: ' + car.getNumber()}">VALUE</p>
-<p th:text="${'Бренд: ' + car.getBrand().getName()}">VALUE</p>
-
+<p id="carId">ID: VALUE</p>
+<p id="mileage">Пробег: VALUE</p>
+<p id="year">Год выпуска: VALUE</p>
+<p id="reserve">Запас хода: VALUE</p>
+<p id="number">Номер: VALUE</p>
+<p id="brand">Бренд: VALUE</p>
 
 <h2>Назначенные водители:</h2>
-<ul>
-    <li th:each="driver : ${car.getDrivers()}">
-        <span th:text="${driver.getName()}">Driver Name</span>
-    </li>
+<ul id="drivers">
+    <!-- Водители будут добавляться сюда -->
 </ul>
 
 <h2>Активный водитель:</h2>
-<ul>
-<td th:text="${car.getActiveDriver() != null ? car.getActiveDriver().getName() : 'None'}">Активный водитель</td>
-</ul>
+<p id="activeDriver">Активный водитель</p>
 
-<a th:href="@{/cars/{id}/edit(id=${car.getCarId()})}">Редактировать</a>
+<a href="/cars/1/edit">Редактировать</a>
+<a href="/cars/1/assignDrivers">Назначить водителей</a>
+<a href="/cars/1/assignActiveDriver">Назначить активного водителя</a>
 
-<a th:href="@{/cars/{id}/assignDrivers(id=${car.getCarId()})}">Назначить водителей</a>
-
-<a th:href="@{/cars/{id}/assignActiveDriver(id=${car.getCarId()})}">Назначить активного водителя</a>
-
-<form th:method="DELETE" th:action="@{/cars/{id}(id=${car.getCarId()})}">
+<form method="POST" action="/cars/1/delete">
     <input type="submit" value="Delete"/>
 </form>
 </body>

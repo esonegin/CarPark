@@ -25,9 +25,6 @@ public class Manager extends User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "salary")
-    private Integer salary;
-
     @Column(name = "role")
     private String role;
 
@@ -68,14 +65,6 @@ public class Manager extends User {
 
     public void setUsername(String name) {
         this.name = name;
-    }
-
-    public Integer getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Integer salary) {
-        this.salary = salary;
     }
 
     public Long getId() {

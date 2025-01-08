@@ -11,7 +11,5 @@ public class CarParkApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CarParkApplication.class, args);
-
 	}
-
 }

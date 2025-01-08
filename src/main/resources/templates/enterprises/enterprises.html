@@ -12,12 +12,14 @@
         <th>Город нахождения предприятия</th>
         <th>Машины</th>
         <th>Водители</th>
+        <th>Таймзона</th>
 
     </tr>
     <tr th:each="enterprise : ${enterprises}">
         <td th:text="${enterprise.getId()}">ID</td>
         <td th:text="${enterprise.getName()}">Название предприятия</td>
         <td th:text="${enterprise.getCity()}">Город нахождения предприятия</td>
+        <td th:text="${enterprise.getTimeZone()}">Таймзона</td>
 
         <td>
             <ul>

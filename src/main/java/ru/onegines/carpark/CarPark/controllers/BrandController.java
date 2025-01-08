@@ -16,7 +16,7 @@ import java.util.List;
  * @author onegines
  * @date 30.10.2024
  */
-@Controller
+@RestController
 @ControllerAdvice
 @RequestMapping("/brands")
 public class BrandController {
@@ -66,7 +66,7 @@ public class BrandController {
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("brand") Brand brand, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
+                         @PathVariable("id") Long id) {
         if (bindingResult.hasErrors()) {
             return "brands/edit";
         }

@@ -3,6 +3,7 @@ package ru.onegines.carpark.CarPark.models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,16 +20,19 @@ public class Car {
     private Long carId;
 
     @Column(name = "mileage")
-    private int mileage;
+    private Integer mileage;
 
     @Column(name = "год_выпуска")
-    private int год_выпуска;
+    private Integer годВыпуска;
 
     @Column(name = "reserve")
-    private int reserve;
+    private Integer reserve;
 
     @Column(name = "number")
     private String number;
+
+    @Column(name = "created_at")
+    private LocalDateTime purchaseDateTime;
 
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = false)
@@ -51,6 +55,8 @@ public class Car {
     @OneToOne
     @JoinColumn(name = "active_driver_id")
     private Driver activeDriver;
+
+    private String purchaseDateTimeInEnterpriseTimeZone;
 
     public Car() {
     }
@@ -76,12 +82,12 @@ public class Car {
         this.mileage = mileage;
     }
 
-    public int getГод_выпуска() {
-        return год_выпуска;
+    public int getГодВыпуска() {
+        return годВыпуска;
     }
 
-    public void setГод_выпуска(int год_выпуска) {
-        this.год_выпуска = год_выпуска;
+    public void setГодВыпуска(int годВыпуска) {
+        this.годВыпуска = годВыпуска;
     }
 
     public int getReserve() {
@@ -132,12 +138,40 @@ public class Car {
         this.activeDriver = activeDriver;
     }
 
+    public LocalDateTime getPurchaseDateTime() {
+        return purchaseDateTime;
+    }
+
+    public String getPurchaseDateTimeInEnterpriseTimeZone() {
+        return purchaseDateTimeInEnterpriseTimeZone;
+    }
+
+    public void setPurchaseDateTimeInEnterpriseTimeZone(String purchaseDateTimeInEnterpriseTimeZone) {
+        this.purchaseDateTimeInEnterpriseTimeZone = purchaseDateTimeInEnterpriseTimeZone;
+    }
+
+    public void setPurchaseDateTime(LocalDateTime purchaseDateTime) {
+        this.purchaseDateTime = purchaseDateTime;
+    }
+
+    public void setMileage(Integer mileage) {
+        this.mileage = mileage;
+    }
+
+    public void setГодВыпуска(Integer годВыпуска) {
+        this.годВыпуска = годВыпуска;
+    }
+
+    public void setReserve(Integer reserve) {
+        this.reserve = reserve;
+    }
+
     @Override
     public String toString() {
         return "Car{" +
                 "carId=" + carId +
                 ", mileage=" + mileage +
-                ", год_выпуска=" + год_выпуска +
+                ", год_выпуска=" + годВыпуска +
                 ", reserve=" + reserve +
                 ", number='" + number + '\'' +
                 ", brand=" + brand +
@@ -146,4 +180,6 @@ public class Car {
                 ", activeDriver=" + activeDriver +
                 '}';
     }
+
+
 }

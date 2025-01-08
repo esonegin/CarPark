@@ -33,6 +33,13 @@ public class Driver {
     @OneToOne(mappedBy = "activeDriver")
     private Car activeCar;
 
+    public Driver(String name, int salary, String enterprise) {
+    }
+
+    public Driver() {
+
+    }
+
     public Long getId() {
         return id;
     }
