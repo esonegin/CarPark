@@ -1,8 +1,8 @@
 package ru.onegines.carpark.CarPark.models;
 
 import jakarta.persistence.*;
-import org.locationtech.jts.geom.Geometry;
-//import org.locationtech.jts.geom.Point;
+
+import org.locationtech.jts.geom.Point;
 
 import java.awt.*;
 import java.time.ZonedDateTime;
@@ -24,7 +24,7 @@ public class RoutePoint {
 
 
     @Column(name = "point", columnDefinition = "geometry(Point,4326)")
-    private Geometry point;
+    private Point point;
 
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime timestampUtc;
@@ -32,11 +32,11 @@ public class RoutePoint {
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    public Geometry getPoint() {
+    public Point getPoint() {
         return point;
     }
 
-    public void setPoint(Geometry point) {
+    public void setPoint(Point point) {
         this.point = point;
     }
 
@@ -71,4 +71,5 @@ public class RoutePoint {
     public void setCreated_at(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
 }
