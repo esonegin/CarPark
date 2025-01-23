@@ -1,4 +1,4 @@
-package ru.onegines.carpark.CarPark.utills;
+package ru.onegines.carpark.CarPark.utils;
 
 import ru.onegines.carpark.CarPark.dto.EnterpriseDTO;
 import ru.onegines.carpark.CarPark.models.Car;

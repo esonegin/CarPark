@@ -5,16 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.onegines.carpark.CarPark.controllers.TrackGeneratorController;
 import ru.onegines.carpark.CarPark.services.ManagerDetailsService;
 import ru.onegines.carpark.CarPark.services.ManagerService;
-import ru.onegines.carpark.CarPark.services.TrackGenerationService;
 
 
 /**
@@ -28,24 +25,26 @@ public class SecurityConfig {
 
     private final ManagerDetailsService managerDetailsService;
     private final ManagerService managerService;
-    private final TrackGenerationService trackGeneratorService;
-    public final TrackGeneratorController trackGeneratorController;
+
 
     @Autowired
-    public SecurityConfig(ManagerDetailsService managerDetailsService, ManagerService managerService, TrackGenerationService trackGeneratorService, TrackGeneratorController trackGeneratorController) {
+    public SecurityConfig(ManagerDetailsService managerDetailsService, ManagerService managerService) {
         this.managerDetailsService = managerDetailsService;
         this.managerService = managerService;
-        this.trackGeneratorService = trackGeneratorService;
-        this.trackGeneratorController = trackGeneratorController;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // Ранее закомментированное добавление фильтра
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/set-timezone"))
+
+                /*.csrf(csrf -> csrf.ignoringRequestMatchers("/set-timezone"))
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/route/**"))*/
+                .csrf(csrf -> csrf.disable())
                 //.addFilterAfter(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class) // Добавляем TimeZoneFilter после аутентификации;
-                .authorizeHttpRequests(auth -> auth
+                /*.authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/route/generate/**").permitAll()
                         .requestMatchers("/set-timezone").permitAll()
                         .requestMatchers(HttpMethod.POST, "/managers/{managerId}/enterprises/{enterpriseId}/cars").permitAll()
                         .requestMatchers(HttpMethod.POST, "/track-generator/start/**").hasAuthority("MANAGER")
@@ -59,6 +58,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/error").permitAll()
                         .requestMatchers("/enterprises").hasRole("MANAGER")
                         .anyRequest().authenticated()
+                )*/
+
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
                 )
 
                 .formLogin(form -> form
@@ -68,9 +71,6 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             String managerName = authentication.getName();
                             Long managerId = managerService.findByUsername(managerName).get().getId();
-                            if (authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("MANAGER"))) {
-                                trackGeneratorController.startTracking(5L);
-                            }
                             response.sendRedirect("/managers/" + managerId + "/enterprises");
                         })
                         .failureHandler((request, response, exception) -> {

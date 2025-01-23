@@ -102,4 +102,5 @@ public class Enterprise {
     public ZoneId getZoneId() {
         return ZoneId.of(getTimeZone());
     }
+
 }

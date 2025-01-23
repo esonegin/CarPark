@@ -1,4 +1,4 @@
-package ru.onegines.carpark.CarPark.utills;
+package ru.onegines.carpark.CarPark.utils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -22,6 +22,8 @@ public class RoutePoint {
     @Column(name = "car_id")
     private Long carId;
 
+    @Column(name = "route_id")
+    private Long routeId;
 
     @Column(name = "point", columnDefinition = "geometry(Point,4326)")
     private Point point;
@@ -72,4 +74,19 @@ public class RoutePoint {
         this.createdAt = createdAt;
     }
 
+    public Long getRouteId() {
+        return routeId;
+    }
+
+    public void setRouteId(Long routeId) {
+        this.routeId = routeId;
+    }
+
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

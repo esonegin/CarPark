@@ -1,4 +1,4 @@
-package ru.onegines.carpark.CarPark.utills;
+package ru.onegines.carpark.CarPark.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.shell.standard.ShellComponent;
