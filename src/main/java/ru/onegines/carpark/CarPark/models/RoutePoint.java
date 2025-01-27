@@ -22,17 +22,15 @@ public class RoutePoint {
     @Column(name = "car_id")
     private Long carId;
 
-    @Column(name = "route_id")
-    private Long routeId;
+    @ManyToOne
+    @JoinColumn(name = "route_id", nullable = false)
+    private Route route;
 
     @Column(name = "point", columnDefinition = "geometry(Point,4326)")
     private Point point;
 
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime timestampUtc;
-
-    @Column(name = "created_at")
-    private ZonedDateTime createdAt;
 
     public Point getPoint() {
         return point;
@@ -66,27 +64,13 @@ public class RoutePoint {
         this.timestampUtc = timestampUtc;
     }
 
-    public ZonedDateTime getCreated_at() {
-        return createdAt;
+
+    public Route getRoute() {
+        return route;
     }
 
-    public void setCreated_at(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setRoute(Route route) {
+        this.route = route;
     }
 
-    public Long getRouteId() {
-        return routeId;
-    }
-
-    public void setRouteId(Long routeId) {
-        this.routeId = routeId;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
