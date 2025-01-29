@@ -1,6 +1,7 @@
 package ru.onegines.carpark.CarPark.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jakarta.annotation.PreDestroy;
@@ -18,6 +19,8 @@ import ru.onegines.carpark.CarPark.repositories.RoutePointRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
+
 import org.locationtech.jts.geom.*;
 import ru.onegines.carpark.CarPark.repositories.RouteRepository;
 
@@ -81,14 +84,94 @@ public class RouteGenerationService {
         this.pointsGenerated = 0;
     }
 
+    @Transactional
+    public void generateMonthlyRoutes(Long carId, int numRoutes, double maxRadius, double maxTrackLength, int maxStep) {
+        Random random = new Random();
+
+        // Координаты Москвы (центр города)
+        double moscowLat = 55.7558;  // Широта Москвы
+        double moscowLon = 37.6173;  // Долгота Москвы
+
+        for (int i = 0; i < numRoutes; i++) {
+            // Генерация случайных координат в пределах Москвы
+            double startLat = moscowLat + (random.nextDouble() - 0.5) * 0.1; // Генерация случайной широты в пределах 10 км
+            double startLon = moscowLon + (random.nextDouble() - 0.5) * 0.1; // Генерация случайной долготы в пределах 10 км
+
+            // Генерация конечных координат в пределах Москвы
+            double endLat = moscowLat + (random.nextDouble() - 0.5) * 0.1;
+            double endLon = moscowLon + (random.nextDouble() - 0.5) * 0.1;
+
+            // Получаем маршрут по автодорогам через OpenRouteService API
+            String apiKey = "5b3ce3597851110001cf62483be0355aa52f408eae421fd99091b903";
+            String openRouteServiceUrl = UriComponentsBuilder.fromHttpUrl("https://api.openrouteservice.org/v2/directions/driving-car")
+                    .queryParam("api_key", apiKey)
+                    .queryParam("start", startLon + "," + startLat)
+                    .queryParam("end", endLon + "," + endLat)
+                    .toUriString();
+
+            RestTemplate restTemplate = new RestTemplate();
+            try {
+                ResponseEntity<String> response = restTemplate.getForEntity(openRouteServiceUrl, String.class);
+                List<Coordinate> routeCoordinates = parseRouteCoordinates(response.getBody());
+
+                if (routeCoordinates == null || routeCoordinates.isEmpty()) {
+                    System.out.println("Маршрут не найден.");
+                    continue;
+                }
+
+                // Генерация маршрута
+                Route route = new Route();
+                route.setCarId(carId);
+                route.setStartTimeUtc(ZonedDateTime.now().minusDays(random.nextInt(30)).minusHours(random.nextInt(24)));
+                route.setEndTimeUtc(route.getStartTimeUtc().plusMinutes((long) (maxTrackLength / maxStep)));
+                routeRepository.save(route);
+
+                // Генерация точек маршрута
+                double currentTrackLength = 0;
+                ZonedDateTime currentTimestamp = route.getStartTimeUtc();
+                for (Coordinate coordinate : routeCoordinates) {
+                    double lat = coordinate.getY();
+                    double lon = coordinate.getX();
+
+                    if (currentTrackLength >= maxTrackLength) {
+                        break;
+                    }
+
+                    // Генерация точки маршрута
+                    RoutePoint routePoint = new RoutePoint();
+                    routePoint.setRoute(route);
+                    routePoint.setCarId(carId);
+                    Point point = createPoint(lon, lat);  // Создаём точку маршрута
+                    routePoint.setPoint(point);
+                    routePoint.setTimestampUtc(currentTimestamp);
+                    routePointRepository.save(routePoint);
+
+                    currentTrackLength += maxStep;
+                    currentTimestamp = currentTimestamp.plusSeconds(60);  // Допустим, точка каждые 60 секунд
+
+                    System.out.println("Точка маршрута сохранена: " + point);
+                }
+
+                System.out.println("Маршрут сгенерирован: " + route.getId());
+
+            } catch (Exception e) {
+                System.out.println("Ошибка при генерации маршрута: " + e.getMessage());
+            }
+        }
+    }
+
+
+
+
     @PreDestroy
     @Transactional
-    public void stopRouteGeneration() {
+    public boolean stopRouteGeneration() {
         if (currentRoute != null) {
             currentRoute.setEndTimeUtc(ZonedDateTime.now());
             routeRepository.save(currentRoute);
             System.out.println("Маршрут завершён при остановке приложения: " + currentRoute);
         }
+        return false;
     }
 
     // Метод для запуска генерации точек маршрута каждые 10 секунд
@@ -176,17 +259,28 @@ public class RouteGenerationService {
         return R * c; // возвращаем расстояние в километрах
     }
 
-    private Point createPoint(double lon, double lat) {
+    /*private Point createPoint(double lon, double lat) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(lon, lat);
         return geometryFactory.createPoint(coordinate);
+    }
+*/
+    private Point createPoint(double lon, double lat) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate coordinate = new Coordinate(lon, lat);
+        // Преобразуем Coordinate в массив
+        Coordinate[] coordinates = new Coordinate[]{coordinate};
+        // Создаем CoordinateSequence
+        CoordinateSequence sequence = geometryFactory.getCoordinateSequenceFactory().create(coordinates);
+        // Создаем Point
+        return geometryFactory.createPoint(sequence);
     }
 
     public List<Coordinate> parseRouteCoordinates(String responseBody) {
         List<Coordinate> coordinates = new ArrayList<>();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(responseBody);
+            ObjectMapper jacksonObjectMapper = new ObjectMapper();
+            JsonNode rootNode = jacksonObjectMapper.readTree(responseBody);
             System.out.println("JSON ответ: " + responseBody);
 
             JsonNode featuresNode = rootNode.path("features");

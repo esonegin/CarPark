@@ -10,4 +10,9 @@ import java.util.List;
 public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
     // Вы можете добавить методы для кастомных запросов, если необходимо
     List<RoutePoint> findAllByCarIdOrderByTimestampUtc(Long carId);
+
+    List<RoutePoint> findAllByRouteIdOrderByTimestampUtc(Long routeId);
+
+    List<RoutePoint> findAllByRouteIdInOrderByTimestampUtc(List<Long> routeIds);
+
 }

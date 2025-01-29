@@ -21,14 +21,14 @@ public class TimeZoneFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String timezone = request.getParameter("timezone");
-        System.out.println("Timezone from request: " + timezone); // Логирование таймзоны
         if (timezone != null && !timezone.isEmpty()) {
             HttpSession session = request.getSession();
             session.setAttribute("clientTimezone", timezone);
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); // Всегда передаем запрос дальше в цепочке
     }
 }
+
 
 
 

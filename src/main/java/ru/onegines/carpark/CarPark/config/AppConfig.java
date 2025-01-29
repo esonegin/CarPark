@@ -20,11 +20,6 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 public class AppConfig {
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
-
-    @Bean
     public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter() {
         FilterRegistrationBean<HiddenHttpMethodFilter> filter = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());
         filter.setOrder(1); // Установите приоритет

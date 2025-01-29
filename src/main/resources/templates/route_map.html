@@ -15,12 +15,29 @@
         .controls {
             margin: 10px;
         }
+        .spinner {
+            display: none;
+            margin: 10px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 <div class="controls">
     <input type="text" id="carIdInput" placeholder="Введите ID автомобиля" />
+    <input type="datetime-local" id="startTimeInput" placeholder="Начало" />
+    <input type="datetime-local" id="endTimeInput" placeholder="Конец" />
     <button id="loadRouteButton">Загрузить маршрут</button>
+    <div class="spinner" id="spinner"></div>
 </div>
 <div id="map"></div>
 
@@ -34,39 +51,46 @@
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Ваш API-ключ OpenRouteService
-    const API_KEY = "5b3ce3597851110001cf62483be0355aa52f408eae421fd99091b903".trim(); // Замените на ваш реальный ключ
+    const spinner = document.getElementById("spinner");
 
     // Обработчик клика по кнопке
     document.getElementById("loadRouteButton").addEventListener("click", async () => {
         const carId = document.getElementById("carIdInput").value.trim();
+        const startTime = document.getElementById("startTimeInput").value;
+        const endTime = document.getElementById("endTimeInput").value;
 
-        if (!carId) {
-            alert("Введите ID автомобиля!");
+        if (!carId || !startTime || !endTime) {
+            alert("Пожалуйста, заполните все поля!");
             return;
         }
 
         try {
-            // Запрос точек маршрута
-            const routePoints = await fetch(`/route/fetch/${carId}`)
-                .then(res => {
-                    if (!res.ok) throw new Error("Ошибка при получении точек маршрута");
-                    return res.json();
-                });
+            spinner.style.display = "block"; // Показываем спиннер
 
-            if (!routePoints || routePoints.length === 0) {
-                alert("Маршрут не найден для указанного ID автомобиля.");
-                return;
+            // Единый запрос к серверу
+            const response = await fetch(`/route/filter?carId=${carId}&start=${startTime}&end=${endTime}`);
+            if (!response.ok) {
+                throw new Error("Ошибка при запросе маршрута: " + response.statusText);
             }
 
-            // Запрос маршрута к OpenRouteService
-            const coordinates = await fetchRouteFromORS(API_KEY, routePoints);
+            const data = await response.json();
+
+            // Проверяем, что данные содержат маршрут
+            if (!data.routes || !data.routes[0] || !data.routes[0].geometry) {
+                throw new Error("Неполные данные получены от сервера");
+            }
+
+            // Декодируем маршрут из OpenRouteService
+            const polyline = data.routes[0].geometry; // Получаем полилинию из routes[0].geometry
+            const coordinates = decodePolyline(polyline);
 
             // Отображение маршрута на карте
             displayRouteOnMap(coordinates);
         } catch (error) {
             console.error("Ошибка:", error);
             alert("Ошибка при загрузке маршрута: " + error.message);
+        } finally {
+            spinner.style.display = "none"; // Скрываем спиннер
         }
     });
 
@@ -96,35 +120,6 @@
             coordinates.push([lat * 1e-5, lng * 1e-5]);
         }
         return coordinates;
-    }
-
-    // Получение маршрута из OpenRouteService
-    async function fetchRouteFromORS(apiKey, routePoints) {
-        const requestBody = {
-            coordinates: routePoints,
-            profile: "driving-car",
-            format: "json"
-        };
-
-        const response = await fetch("https://api.openrouteservice.org/v2/directions/driving-car", {
-            method: "POST",
-            headers: {
-                "Authorization": apiKey,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            throw new Error("Ошибка при запросе к OpenRouteService");
-        }
-
-        const orsResponse = await response.json();
-        const polyline = orsResponse.routes?.[0]?.geometry;
-        if (!polyline) {
-            throw new Error("Геометрия маршрута отсутствует в ответе");
-        }
-        return decodePolyline(polyline);
     }
 
     // Отображение маршрута на карте
