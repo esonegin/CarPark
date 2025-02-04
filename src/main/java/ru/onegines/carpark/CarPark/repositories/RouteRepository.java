@@ -1,5 +1,6 @@
 package ru.onegines.carpark.CarPark.repositories;
 
+import org.springframework.beans.PropertyValues;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.Route;
@@ -16,5 +17,8 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
             ZonedDateTime startTime,
             ZonedDateTime endTime
     );
+
+    List<Route> findByCarIdAndStartTimeUtcBetween(Long carId, ZonedDateTime start, ZonedDateTime end);
+
 }
 

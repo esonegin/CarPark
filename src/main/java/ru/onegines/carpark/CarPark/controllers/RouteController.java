@@ -1,9 +1,9 @@
 package ru.onegines.carpark.CarPark.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import ru.onegines.carpark.CarPark.models.Route;
-import ru.onegines.carpark.CarPark.models.RoutePoint;
+import ru.onegines.carpark.CarPark.dto.RouteDTO;
 import ru.onegines.carpark.CarPark.repositories.CarRepository;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 import ru.onegines.carpark.CarPark.repositories.RoutePointRepository;
@@ -12,13 +12,10 @@ import ru.onegines.carpark.CarPark.services.OpenRouteService;
 import ru.onegines.carpark.CarPark.services.RouteGenerationService;
 import ru.onegines.carpark.CarPark.services.RouteService;
 
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 /**
  * @author onegines
@@ -33,6 +30,7 @@ public class RouteController {
     private final RouteRepository routeRepository;
     private final RouteService routeService;
     private final OpenRouteService openRouteService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public RouteController(RouteGenerationService routeGenerationService, RoutePointRepository routePointRepository, RouteRepository routeRepository, CarRepository carRepository, EnterpriseRepository enterpriseRepository, RouteService routeService, OpenRouteService openRouteService) {
         this.routeGenerationService = routeGenerationService;
@@ -114,7 +112,39 @@ public class RouteController {
             @RequestParam String end
     ) {
         try {
-            return ResponseEntity.ok(routeService.requestFromOpenRouteService(carId, start, end).get("orsResponse"));
+            // Получаем данные от OpenRouteService
+            Map<String, Object> orsResponse = routeService.requestFromOpenRouteService(carId, start, end);
+
+            // Проверяем, есть ли данные в ответе
+            if (orsResponse.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Маршруты не найдены в заданном диапазоне.");
+            }
+
+            // Возвращаем ответ
+            return ResponseEntity.ok(orsResponse.get("orsResponse"));
+        } catch (IllegalArgumentException e) {
+            // Обработка ошибки "Нет маршрутов в заданном диапазоне"
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            // Обработка других ошибок
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при обработке запроса: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/api")
+    public ResponseEntity<?> getTrips(
+            @RequestParam Long carId,
+            @RequestParam String start,
+            @RequestParam String end
+    ) {
+        try {
+            List<RouteDTO> trips = routeService.getTrips(carId, start, end);
+
+            ///Сейчас выдает начальные и конечные точки совокупности поездок, нужно по каждой поездке отдельно
+            return ResponseEntity.ok(trips);
         } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().body("Некорректный формат даты. Используйте формат: yyyy-MM-dd'T'HH:mm");
         } catch (Exception e) {
@@ -122,5 +152,4 @@ public class RouteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка обработки маршрута: " + e.getMessage());
         }
     }
-
 }

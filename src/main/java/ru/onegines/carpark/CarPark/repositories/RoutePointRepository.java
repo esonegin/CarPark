@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.RoutePoint;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
@@ -14,5 +15,11 @@ public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
     List<RoutePoint> findAllByRouteIdOrderByTimestampUtc(Long routeId);
 
     List<RoutePoint> findAllByRouteIdInOrderByTimestampUtc(List<Long> routeIds);
+
+    // Находит первую точку маршрута с валидным адресом, отсортированную по времени в порядке возрастания
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(Long routeId, List<String> invalidAddresses);
+
+    // Находит последнюю точку маршрута с валидным адресом, отсортированную по времени в порядке убывания
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(Long routeId, List<String> invalidAddresses);
 
 }

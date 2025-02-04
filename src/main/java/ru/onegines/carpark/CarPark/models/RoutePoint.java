@@ -32,6 +32,17 @@ public class RoutePoint {
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime timestampUtc;
 
+    @Column(name = "adress") // Новое поле для текстового представления адреса
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public Point getPoint() {
         return point;
     }

@@ -1,9 +1,14 @@
 package ru.onegines.carpark.CarPark.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
+import ru.onegines.carpark.CarPark.dto.RouteDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.models.Route;
@@ -12,15 +17,13 @@ import ru.onegines.carpark.CarPark.repositories.CarRepository;
 import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 import ru.onegines.carpark.CarPark.repositories.RoutePointRepository;
 import ru.onegines.carpark.CarPark.repositories.RouteRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +38,8 @@ public class RouteService {
     private final RouteRepository routeRepository;
     private final RoutePointRepository routePointRepository;
     private final OpenRouteService openRouteService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
 
     @Value("${openrouteservice.api.key}")
     private String apiKey;
@@ -47,6 +52,7 @@ public class RouteService {
         this.openRouteService = openRouteService;
     }
 
+
     //Конвертация дат фильтра в тайм-зону предприятия
     public HashMap<String, ZonedDateTime> getZoneStartAnEndTime(Long carId, String start, String end) {
         Car car = carRepository.findById(carId)
@@ -58,9 +64,10 @@ public class RouteService {
         String enterpriseTimeZone = enterprise.getTimeZone();
         ZoneId zoneId = (enterpriseTimeZone != null) ? ZoneId.of(enterpriseTimeZone) : ZoneId.of("UTC");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        ZonedDateTime zonedStartTime = LocalDateTime.parse(start, formatter).atZone(zoneId);
-        ZonedDateTime zonedEndTime = LocalDateTime.parse(end, formatter).atZone(zoneId);
+        // Преобразуем строки в ZonedDateTime
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(zoneId);
+        ZonedDateTime zonedStartTime = ZonedDateTime.parse(start, formatter);
+        ZonedDateTime zonedEndTime = ZonedDateTime.parse(end, formatter);
 
         HashMap<String, ZonedDateTime> zoneTime = new HashMap<>();
         zoneTime.put("start", zonedStartTime);
@@ -70,13 +77,19 @@ public class RouteService {
 
     //Получение координат маршрутов
     public List<double[]> getPointsForDataFilter(Long carId, String start, String end) {
-        //Фильтрация маршрутов
-        HashMap<String, ZonedDateTime> formatedDates = getZoneStartAnEndTime(carId, start, end);
+        // Фильтрация маршрутов
+        HashMap<String, ZonedDateTime> formattedDates = getZoneStartAnEndTime(carId, start, end);
         List<Route> routes = routeRepository.findAllByCarIdAndStartTimeUtcGreaterThanEqualAndEndTimeUtcLessThanEqual(
-                carId, formatedDates.get("start"), formatedDates.get("end"));
+                carId, formattedDates.get("start"), formattedDates.get("end"));
+
+        // Логирование для отладки
+        System.out.println("Диапазон дат: " + formattedDates.get("start") + " - " + formattedDates.get("end"));
+        System.out.println("Найденные маршруты: " + routes);
+
         if (routes.isEmpty()) {
             throw new IllegalArgumentException("Нет маршрутов в заданном диапазоне.");
         }
+
         List<Long> routesId = routes.stream()
                 .map(Route::getId)
                 .collect(Collectors.toList());
@@ -104,6 +117,93 @@ public class RouteService {
         Map<String, Object> response = new HashMap<>();
         response.put("orsResponse", orsResponse);
         return response;
+
+    }
+
+
+    public List<RouteDTO> getTrips(Long carId, String start, String end) {
+        // Получаем отформатированные даты
+        HashMap<String, ZonedDateTime> formattedDates = getZoneStartAnEndTime(carId, start, end);
+        // Получаем список маршрутов в заданном диапазоне
+        List<Route> routes = routeRepository.findByCarIdAndStartTimeUtcBetween(carId, formattedDates.get("start"), formattedDates.get("end"));
+
+        // Преобразуем маршруты в RouteDTO
+        return routes.stream()
+                .map(route -> {
+                    try {
+                        // Извлекаем названия улиц для начальной и конечной точек из таблицы route_points
+                        String startAddress = findFirstValidAddressByRouteId(route.getId());
+                        String endAddress = findLastValidAddressByRouteId(route.getId());
+
+                        // Создаем RouteDTO
+                        return new RouteDTO(
+                                route.getId(),
+                                startAddress,
+                                endAddress,
+                                route.getStartTimeUtc(),
+                                route.getEndTimeUtc()
+                        );
+                    } catch (Exception e) {
+                        // Логируем ошибки
+                        logger.error("Ошибка при обработке маршрута: {}", e.getMessage());
+                        throw new RuntimeException("Ошибка при обработке маршрута", e);
+                    }
+                })
+                .toList();
+    }
+
+    private String findFirstValidAddressByRouteId(Long routeId) {
+        // Находим первую точку маршрута с валидным адресом
+        Optional<RoutePoint> firstValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(
+                routeId,
+                List.of("Адрес не найден", "-")
+        );
+
+        // Возвращаем адрес или дефолтное значение
+        return firstValidPoint.map(RoutePoint::getAddress).orElse("Адрес не определен");
+    }
+
+    private String findLastValidAddressByRouteId(Long routeId) {
+        // Находим последнюю точку маршрута с валидным адресом
+        Optional<RoutePoint> lastValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(
+                routeId,
+                List.of("Адрес не найден", "-")
+        );
+
+        // Возвращаем адрес или дефолтное значение
+        return lastValidPoint.map(RoutePoint::getAddress).orElse("Адрес не определен");
+    }
+
+    private HashMap<String, String> extractStreetName(Map<String, Object> orsResponse) {
+        HashMap<String, String> startAndEnd = new HashMap<>();
+        try {
+            // Предполагаем, что orsResponse содержит JSON-ответ от OpenRouteService в виде строки
+            String orsResponseString = (String) orsResponse.get("orsResponse");
+
+            // Преобразуем строку в JsonNode
+            JsonNode rootNode = objectMapper.readTree(orsResponseString);
+            JsonNode routesNode = rootNode.path("routes");
+            ArrayList streets = new ArrayList<>();
+            if (routesNode.isArray() && routesNode.size() > 0) {
+                JsonNode firstRoute = routesNode.get(0);
+                JsonNode segmentsNode = firstRoute.path("segments");
+
+                for (JsonNode segment : segmentsNode) {
+                    if (!segment.get("steps").get(0).get("name").asText().equals("-")) {
+                        streets.add(segment.get("steps").get(0).get("name"));
+                    }
+                }
+                startAndEnd.put("start_point", streets.get(0).toString());
+                startAndEnd.put("end_point", streets.get(streets.size() - 1).toString());
+                return startAndEnd;
+            }
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
 

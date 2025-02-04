@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ public class RouteGenerationService {
 
     private double currentDistance = 0;
     private int pointsGenerated = 0;
+
+    @Value("${openrouteservice.api.key}")
+    private String apiKey;
 
     private Long carId;
     private double radius;
@@ -87,7 +91,6 @@ public class RouteGenerationService {
     @Transactional
     public void generateMonthlyRoutes(Long carId, int numRoutes, double maxRadius, double maxTrackLength, int maxStep) {
         Random random = new Random();
-
         // Координаты Москвы (центр города)
         double moscowLat = 55.7558;  // Широта Москвы
         double moscowLon = 37.6173;  // Долгота Москвы
@@ -96,13 +99,11 @@ public class RouteGenerationService {
             // Генерация случайных координат в пределах Москвы
             double startLat = moscowLat + (random.nextDouble() - 0.5) * 0.1; // Генерация случайной широты в пределах 10 км
             double startLon = moscowLon + (random.nextDouble() - 0.5) * 0.1; // Генерация случайной долготы в пределах 10 км
-
             // Генерация конечных координат в пределах Москвы
             double endLat = moscowLat + (random.nextDouble() - 0.5) * 0.1;
             double endLon = moscowLon + (random.nextDouble() - 0.5) * 0.1;
 
             // Получаем маршрут по автодорогам через OpenRouteService API
-            String apiKey = "5b3ce3597851110001cf62483be0355aa52f408eae421fd99091b903";
             String openRouteServiceUrl = UriComponentsBuilder.fromHttpUrl("https://api.openrouteservice.org/v2/directions/driving-car")
                     .queryParam("api_key", apiKey)
                     .queryParam("start", startLon + "," + startLat)
@@ -129,6 +130,8 @@ public class RouteGenerationService {
                 // Генерация точек маршрута
                 double currentTrackLength = 0;
                 ZonedDateTime currentTimestamp = route.getStartTimeUtc();
+                int stepIndex = 0; // Индекс шага для получения адреса
+
                 for (Coordinate coordinate : routeCoordinates) {
                     double lat = coordinate.getY();
                     double lon = coordinate.getX();
@@ -137,23 +140,27 @@ public class RouteGenerationService {
                         break;
                     }
 
-                    // Генерация точки маршрута
+                    // Извлечение адреса из ответа API
+                    String address = extractAddressFromResponse(response.getBody(), stepIndex);
+
+                    // Создание точки маршрута
                     RoutePoint routePoint = new RoutePoint();
                     routePoint.setRoute(route);
                     routePoint.setCarId(carId);
-                    Point point = createPoint(lon, lat);  // Создаём точку маршрута
+                    Point point = createPoint(lon, lat); // Создаём точку маршрута
                     routePoint.setPoint(point);
                     routePoint.setTimestampUtc(currentTimestamp);
+                    routePoint.setAddress(address); // Устанавливаем адрес
                     routePointRepository.save(routePoint);
 
-                    currentTrackLength += maxStep;
-                    currentTimestamp = currentTimestamp.plusSeconds(60);  // Допустим, точка каждые 60 секунд
+                    System.out.println("Точка маршрута сохранена: " + point + ", адрес: " + address);
 
-                    System.out.println("Точка маршрута сохранена: " + point);
+                    currentTrackLength += maxStep;
+                    currentTimestamp = currentTimestamp.plusSeconds(60); // Точка каждые 60 секунд
+                    stepIndex++; // Увеличиваем индекс шага
                 }
 
                 System.out.println("Маршрут сгенерирован: " + route.getId());
-
             } catch (Exception e) {
                 System.out.println("Ошибка при генерации маршрута: " + e.getMessage());
             }
@@ -180,17 +187,14 @@ public class RouteGenerationService {
         if (currentDistance >= trackLength) {
             // Завершаем маршрут
             if (currentRoute != null) {
-                // Устанавливаем время завершения маршрута
                 currentRoute.setEndTimeUtc(ZonedDateTime.now());
-                routeRepository.save(currentRoute); // Сохраняем маршрут с обновленным временем
+                routeRepository.save(currentRoute);
                 System.out.println("Маршрут завершен: " + currentRoute);
-
-                currentRoute = null; // Сбрасываем текущий маршрут
+                currentRoute = null;
             }
             return;
         }
 
-        String apiKey = "5b3ce3597851110001cf62483be0355aa52f408eae421fd99091b903";
         String openRouteServiceUrl = UriComponentsBuilder.fromHttpUrl("https://api.openrouteservice.org/v2/directions/driving-car")
                 .queryParam("api_key", apiKey)
                 .queryParam("start", startLon + "," + startLat)
@@ -217,12 +221,16 @@ public class RouteGenerationService {
                 // Создаём объект Point
                 Point point = createPoint(lon, lat);
 
+                // Извлекаем адрес из ответа OpenRouteService
+                String address = extractAddressFromResponse(response.getBody(), pointsGenerated);
+
                 // Создаём и сохраняем RoutePoint
                 RoutePoint routePoint = new RoutePoint();
                 routePoint.setCarId(carId);
-                routePoint.setRoute(currentRoute); // Устанавливаем связь с текущим маршрутом
-                routePoint.setPoint(point); // Устанавливаем Point
+                routePoint.setRoute(currentRoute);
+                routePoint.setPoint(point);
                 routePoint.setTimestampUtc(ZonedDateTime.now());
+                routePoint.setAddress(address); // Устанавливаем адрес
 
                 routePointRepository.save(routePoint);
                 System.out.println("RoutePoint сохранен: " + routePoint);
@@ -233,9 +241,9 @@ public class RouteGenerationService {
                 if (currentDistance >= trackLength) {
                     // Завершаем маршрут после добавления последней точки
                     currentRoute.setEndTimeUtc(ZonedDateTime.now());
-                    routeRepository.save(currentRoute); // Сохраняем маршрут
+                    routeRepository.save(currentRoute);
                     System.out.println("Маршрут завершен. Время окончания: " + currentRoute.getEndTimeUtc());
-                    currentRoute = null; // Сбрасываем текущий маршрут
+                    currentRoute = null;
                 }
             } else {
                 System.out.println("Точка за пределами заданного радиуса: " + lat + ", " + lon);
@@ -246,7 +254,67 @@ public class RouteGenerationService {
         }
     }
 
+    private String extractAddressFromResponse(String responseBody, int stepIndex) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(responseBody);
 
+            // Переходим к узлу "features"
+            JsonNode featuresNode = rootNode.path("features");
+            if (!featuresNode.isArray() || featuresNode.size() == 0) {
+                System.out.println("Узел 'features' отсутствует или пуст.");
+                return "Адрес не найден";
+            }
+
+            // Берём первый элемент из массива "features"
+            JsonNode firstFeature = featuresNode.get(0);
+            if (firstFeature == null || !firstFeature.isObject()) {
+                System.out.println("Первый элемент 'features' отсутствует или имеет неверный тип.");
+                return "Адрес не найден";
+            }
+
+            // Переходим к узлу "properties" внутри первого элемента "features"
+            JsonNode propertiesNode = firstFeature.path("properties");
+            if (propertiesNode == null || !propertiesNode.isObject()) {
+                System.out.println("Узел 'properties' отсутствует или имеет неверный тип.");
+                return "Адрес не найден";
+            }
+
+            // Переходим к узлу "segments" внутри "properties"
+            JsonNode segmentsNode = propertiesNode.path("segments");
+            if (!segmentsNode.isArray() || segmentsNode.size() == 0) {
+                System.out.println("Узел 'segments' отсутствует или пуст.");
+                return "Адрес не найден";
+            }
+
+            // Берём первый сегмент маршрута
+            JsonNode firstSegment = segmentsNode.get(0);
+            if (firstSegment == null || !firstSegment.isObject()) {
+                System.out.println("Первый сегмент маршрута отсутствует.");
+                return "Адрес не найден";
+            }
+
+            // Переходим к узлу "steps" внутри первого сегмента
+            JsonNode stepsNode = firstSegment.path("steps");
+            if (!stepsNode.isArray() || stepsNode.size() <= stepIndex) {
+                System.out.println("Узел 'steps' отсутствует или индекс шага вне диапазона.");
+                return "Адрес не найден";
+            }
+
+            // Берём нужный шаг маршрута
+            JsonNode step = stepsNode.get(stepIndex);
+            if (step == null || !step.isObject()) {
+                System.out.println("Шаг маршрута с индексом " + stepIndex + " отсутствует.");
+                return "Адрес не найден";
+            }
+
+            // Извлекаем значение поля "name" из текущего шага
+            return step.path("name").asText();
+        } catch (Exception e) {
+            System.out.println("Ошибка при извлечении адреса: " + e.getMessage());
+        }
+        return "Адрес не найден";
+    }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final double R = 6371; // Радиус Земли в километрах
