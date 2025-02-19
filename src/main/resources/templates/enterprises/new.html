@@ -17,6 +17,10 @@
     <div style="color:red" th:if="${#fields.hasErrors('city')}" th:errors="*{city}">Город нахождения предприятия бака Error</div>
     <br/>
 
+    <label for="timeZone">Таймзона:</label>
+    <input type="text" th:field="*{timeZone}" id="timeZone" placeholder="Введите таймзону (например, Europe/Moscow)">
+    <div style="color:red" th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}">Ошибка таймзоны</div>
+
     <input type="submit" value=" Создать!"/>
 </form>
 

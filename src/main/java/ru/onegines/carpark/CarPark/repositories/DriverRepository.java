@@ -10,5 +10,5 @@ import java.util.Set;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
-
+    Set<Driver> findByEnterpriseIn(Set<Enterprise> enterprises);
 }

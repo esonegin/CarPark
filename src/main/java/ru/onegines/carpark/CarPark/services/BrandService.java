@@ -40,7 +40,7 @@ public class BrandService {
     }
 
     @Transactional
-    public void update(int id, Brand updatedBrand){
+    public void update(Long id, Brand updatedBrand){
         updatedBrand.setId(id);
         brandRepository.save(updatedBrand);
     }

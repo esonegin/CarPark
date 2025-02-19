@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Детали машины</title>
+</head>
+<body>
+<h1>Детали машины</h1>
+
+<h2>Список поездок</h2>
+<ul>
+    <li th:each="trip : ${trips}">
+        <a th:href="@{/map/route(start=${trip.startTimeUtc}, end=${trip.endTimeUtc}, carId=${car.carId})}">
+            Поездка [[${trip.id}]] (с [[${trip.startTimeUtc}]] до [[${trip.endTimeUtc}]])
+        </a>
+        <br>
+        <span>Начало: [[${trip.startAddress}]]</span><br>
+        <span>Конец: [[${trip.endAddress}]]</span>
+    </li>
+</ul>
+
+<br>
+<a th:href="@{'/managers/' + ${managerId} + '/enterprises/' + ${enterpriseId} + '/cars'}">Назад</a>
+</body>
+</html>

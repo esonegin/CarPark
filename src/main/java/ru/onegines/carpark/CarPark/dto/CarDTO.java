@@ -1,72 +1,109 @@
 package ru.onegines.carpark.CarPark.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author onegines
  * @date 31.10.2024
  */
 public class CarDTO {
-    private Long car_id; // ID автомобиля
-    private int brand_id; // ID бренда
-    private int mileage;
-    private int год_выпуска;
-    private int reserve;
+    private Long carId; // ID автомобиля
+    private Long brandId; // ID бренда
+    private Integer mileage;
+    private Integer годВыпуска;
+    private Integer reserve;
     private String number;
-    private Long active_driver_id;
+    private Long activeDriverId;
     private List<Long> allDriversId;
-    private Long enterprise_id;
+    private Long enterpriseId;
+    private LocalDateTime purchaseDateTime;
+    private LocalDateTime enterprisePurchaseDateTime;
+    private String purchaseDateTimeInEnterpriseTimeZone;
 
 
-    public CarDTO(Long car_id, int brand_id, int mileage, int год_выпуска, int reserve, String number, Long active_driver_id, List<Long> allDriversId, Long enterprise_id) {
-        this.car_id = car_id;
-        this.brand_id = brand_id;
+    public CarDTO(Long carId, Long brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
+                  Long activeDriverId, List<Long> allDriversId, Long enterpriseId, LocalDateTime purchaseDateTime,
+                  String purchaseDateTimeInEnterpriseTimeZone) {
+        this.carId = carId;
+        this.brandId = brandId;
         this.mileage = mileage;
-        this.год_выпуска = год_выпуска;
+        this.годВыпуска = годВыпуска;
         this.reserve = reserve;
         this.number = number;
-        this.active_driver_id = active_driver_id;
+        this.activeDriverId = activeDriverId;
         this.allDriversId = allDriversId;
-        this.enterprise_id = enterprise_id;
+        this.enterpriseId = enterpriseId;
+        this.purchaseDateTime = purchaseDateTime;
+        this.purchaseDateTimeInEnterpriseTimeZone = purchaseDateTimeInEnterpriseTimeZone;
+
     }
 
-    public Long getCar_id() {
-        return car_id;
+    public CarDTO() {
+
     }
 
-    public void setCar_id(Long car_id) {
-        this.car_id = car_id;
+    public CarDTO(Long carId,
+                  Long brandId,
+                  int mileage,
+                  int годВыпуска,
+                  int reserve,
+                  String number,
+                  Long activeDriverId,
+                  List<Long> allDriversId,
+                  Long enterpriseId,
+                  LocalDateTime purchaseDateTime) {
+        this.carId = carId;
+        this.brandId = brandId;
+        this.mileage = mileage;
+        this.годВыпуска = годВыпуска;
+        this.reserve = reserve;
+        this.number = number;
+        this.activeDriverId = activeDriverId;
+        this.allDriversId = allDriversId;
+        this.enterpriseId = enterpriseId;
+        this.purchaseDateTime = purchaseDateTime;
+
     }
 
-    public int getBrand_id() {
-        return brand_id;
+    public Long getCarId() {
+        return carId;
     }
 
-    public void setBrand_id(int brand_id) {
-        this.brand_id = brand_id;
+    public void setCarId(Long carId) {
+        this.carId = carId;
     }
 
-    public int getMileage() {
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Integer getMileage() {
         return mileage;
     }
 
-    public void setMileage(int mileage) {
+    public void setMileage(Integer mileage) {
         this.mileage = mileage;
     }
 
-    public int getГод_выпуска() {
-        return год_выпуска;
+    public Integer getГодВыпуска() {
+        return годВыпуска;
     }
 
-    public void setГод_выпуска(int год_выпуска) {
-        this.год_выпуска = год_выпуска;
+    public void setГодВыпуска(Integer годВыпуска) {
+        this.годВыпуска = годВыпуска;
     }
 
-    public int getReserve() {
+    public Integer getReserve() {
         return reserve;
     }
 
-    public void setReserve(int reserve) {
+    public void setReserve(Integer reserve) {
         this.reserve = reserve;
     }
 
@@ -78,20 +115,12 @@ public class CarDTO {
         this.number = number;
     }
 
-    public Long getActive_driver_id() {
-        return active_driver_id;
+    public Long getActiveDriverId() {
+        return activeDriverId;
     }
 
-    public void setActive_driver_id(Long active_driver_id) {
-        this.active_driver_id = active_driver_id;
-    }
-
-    public Long getEnterprise_id() {
-        return enterprise_id;
-    }
-
-    public void setEnterprise_id(Long enterprise_id) {
-        this.enterprise_id = enterprise_id;
+    public void setActiveDriverId(Long activeDriverId) {
+        this.activeDriverId = activeDriverId;
     }
 
     public List<Long> getAllDriversId() {
@@ -100,5 +129,68 @@ public class CarDTO {
 
     public void setAllDriversId(List<Long> allDriversId) {
         this.allDriversId = allDriversId;
+    }
+
+    public Long getEnterpriseId() {
+        return enterpriseId;
+    }
+
+    public void setEnterpriseId(Long enterpriseId) {
+        this.enterpriseId = enterpriseId;
+    }
+
+    public LocalDateTime getPurchaseDateTime() {
+        return purchaseDateTime;
+    }
+
+    public void setPurchaseDateTime(LocalDateTime purchaseDateTime) {
+        this.purchaseDateTime = purchaseDateTime;
+    }
+
+    public String getPurchaseDateTimeInEnterpriseTimeZone() {
+        return purchaseDateTimeInEnterpriseTimeZone;
+    }
+
+    public void setPurchaseDateTimeInEnterpriseTimeZone(String purchaseDateTimeInEnterpriseTimeZone) {
+        this.purchaseDateTimeInEnterpriseTimeZone = purchaseDateTimeInEnterpriseTimeZone;
+    }
+
+    public void setEnterprisePurchaseDateTime(LocalDateTime toLocalDateTime) {
+        this.enterprisePurchaseDateTime = toLocalDateTime;
+    }
+
+    public LocalDateTime getEnterprisePurchaseDateTime() {
+        return enterprisePurchaseDateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CarDTO carDTO = (CarDTO) o;
+        return mileage == carDTO.mileage && годВыпуска == carDTO.годВыпуска && reserve == carDTO.reserve && Objects.equals(brandId, carDTO.brandId) && Objects.equals(number, carDTO.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(brandId, mileage, годВыпуска, reserve, number);
+    }
+
+
+    @Override
+    public String toString() {
+        return "CarDTO{" +
+                "carId=" + carId +
+                ", brandId=" + brandId +
+                ", mileage=" + mileage +
+                ", годВыпуска=" + годВыпуска +
+                ", reserve=" + reserve +
+                ", number='" + number + '\'' +
+                ", activeDriverId=" + activeDriverId +
+                ", allDriversId=" + allDriversId +
+                ", enterpriseId=" + enterpriseId +
+                ", purchaseDateTime=" + purchaseDateTime +
+                ", purchaseDateTimeInEnterpriseTimeZone='" + purchaseDateTimeInEnterpriseTimeZone + '\'' +
+                '}';
     }
 }

@@ -1,8 +1,10 @@
 package ru.onegines.carpark.CarPark.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.onegines.carpark.CarPark.dto.CarDTO;
 import ru.onegines.carpark.CarPark.dto.ManagerDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
@@ -12,6 +14,7 @@ import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 import ru.onegines.carpark.CarPark.repositories.ManagerRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,7 +63,6 @@ public class ManagerService {
                 .stream()
                 .map(manager -> new ManagerDTO(manager.getId(),
                         manager.getUsername(),
-                        manager.getSalary(),
                         getAllInterprisesId(manager.getId()),
                         getAllDriversId(manager.getId()),
                         getAllCarsId(manager.getId())))
@@ -117,5 +119,18 @@ public class ManagerService {
                 .stream()
                 .filter(manager -> manager.getUsername().equals(username))
                 .findFirst();
+    }
+
+    // public ManagerDTO(Long id, String managerName, Integer managerSalary, List<Long> allEnterpiseId, List<Long> allDriversId, List<Long> allCarsId) {
+
+    public ManagerDTO getManagerDTOById(Long id) {
+        return managerRepository.findAll()
+                .stream()
+                .filter(manager -> manager.getId() == id)
+                .map(manager -> new ManagerDTO(
+                        manager.getId(),
+                        manager.getUsername()))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Manager not found with ID: " + id));
     }
 }

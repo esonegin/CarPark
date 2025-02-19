@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Автомобили предприятия</title>
+</head>
+<body>
+<h1>Автомобили предприятия</h1>
+<ul>
+  <li th:each="car : ${cars}">
+    <a th:href="@{/managers/{managerId}/enterprises/{enterpriseId}/cars/{carId}(managerId=${managerId}, enterpriseId=${enterpriseId}, carId=${car.carId})}"
+       th:text="${car.number}"></a>
+  </li>
+</ul>
+</body>
+</html>

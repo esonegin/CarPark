@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map" style="height: 600px;"></div>
+
+<script>
+    const carId = new URLSearchParams(window.location.search).get('carId');
+
+    if (!carId) {
+        alert("carId parameter is missing");
+    } else {
+        // Инициализация карты
+        const map = L.map('map').setView([55.751244, 37.618423], 12); // Центр Москвы как пример
+
+        // Добавление базового слоя карты
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Сначала маршрут
+        fetch(`/tracks/geojson?carId=${carId}`)
+            .then(response => response.json())
+            .then(geoJsonRoute => {
+                if (geoJsonRoute.features.length > 0) {
+                    const routeLayer = L.geoJSON(geoJsonRoute, {
+                        style: {
+                            color: 'blue',
+                            weight: 4,
+                            opacity: 0.7
+                        }
+                    }).addTo(map);
+
+                    map.fitBounds(routeLayer.getBounds());
+                }
+            });
+
+// Затем точки
+        fetch(`/tracks/5?carId=${carId}`)
+            .then(response => response.json())
+            .then(geoJsonPoints => {
+                if (geoJsonPoints.features.length > 0) {
+                    L.geoJSON(geoJsonPoints, {
+                        pointToLayer: (feature, latlng) => L.marker(latlng)
+                    }).addTo(map);
+                }
+            });
+    }
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@ public class Brand {
     @Id
     @Column(name = "brand_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Car> cars;
@@ -32,11 +32,11 @@ public class Brand {
     @Column(name = "seats")
     private int seats;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int brand_id) {
+    public void setId(Long brand_id) {
         this.id = id;
     }
 

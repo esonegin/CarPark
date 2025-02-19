@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта маршрутов</title>
+    <!-- Подключение Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .controls {
+            margin: 10px;
+        }
+        .spinner {
+            display: none;
+            margin: 10px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="controls">
+    <input type="text" id="carIdInput" placeholder="Введите ID автомобиля" />
+    <input type="datetime-local" id="startTimeInput" placeholder="Начало" />
+    <input type="datetime-local" id="endTimeInput" placeholder="Конец" />
+    <button id="loadRouteButton">Загрузить маршрут</button>
+    <div class="spinner" id="spinner"></div>
+</div>
+<div id="map"></div>
+
+<script>
+    // Инициализация карты
+    const map = L.map('map').setView([55.756535, 37.617869], 13);
+
+    // Добавление карты OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const spinner = document.getElementById("spinner");
+
+    // Обработчик клика по кнопке
+    document.getElementById("loadRouteButton").addEventListener("click", async () => {
+        const carId = document.getElementById("carIdInput").value.trim();
+        const startTime = document.getElementById("startTimeInput").value;
+        const endTime = document.getElementById("endTimeInput").value;
+
+        if (!carId || !startTime || !endTime) {
+            alert("Пожалуйста, заполните все поля!");
+            return;
+        }
+
+        try {
+            spinner.style.display = "block"; // Показываем спиннер
+
+            // Единый запрос к серверу
+            const response = await fetch(`/route/filter?carId=${carId}&start=${startTime}&end=${endTime}`);
+            if (!response.ok) {
+                throw new Error("Ошибка при запросе маршрута: " + response.statusText);
+            }
+
+            const data = await response.json();
+
+            // Проверяем, что данные содержат маршрут
+            if (!data.routes || !data.routes[0] || !data.routes[0].geometry) {
+                throw new Error("Неполные данные получены от сервера");
+            }
+
+            // Декодируем маршрут из OpenRouteService
+            const polyline = data.routes[0].geometry; // Получаем полилинию из routes[0].geometry
+            const coordinates = decodePolyline(polyline);
+
+            // Отображение маршрута на карте
+            displayRouteOnMap(coordinates);
+        } catch (error) {
+            console.error("Ошибка:", error);
+            alert("Ошибка при загрузке маршрута: " + error.message);
+        } finally {
+            spinner.style.display = "none"; // Скрываем спиннер
+        }
+    });
+
+    // Декодирование полилинии
+    function decodePolyline(polyline) {
+        let index = 0, lat = 0, lng = 0, coordinates = [];
+        while (index < polyline.length) {
+            let shift = 0, result = 0, byte;
+            do {
+                byte = polyline.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+            const deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            lat += deltaLat;
+
+            shift = 0;
+            result = 0;
+            do {
+                byte = polyline.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+            const deltaLng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            lng += deltaLng;
+
+            coordinates.push([lat * 1e-5, lng * 1e-5]);
+        }
+        return coordinates;
+    }
+
+    // Отображение маршрута на карте
+    function displayRouteOnMap(coordinates) {
+        if (!map) {
+            console.error("Карта не инициализирована");
+            return;
+        }
+        const route = L.polyline(coordinates, { color: "blue" }).addTo(map);
+        map.fitBounds(route.getBounds());
+    }
+</script>
+</body>
+</html>

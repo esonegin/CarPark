@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -26,8 +25,8 @@ public class Manager extends User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "salary")
-    private Integer salary;
+    @Column(name = "role")
+    private String role;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -42,9 +41,10 @@ public class Manager extends User {
     }
 
 
-    public Manager(String username, String password, Set<GrantedAuthority> authorities, Long id, Set<Enterprise> enterprises) {
+    public Manager(String username, String password, Set<GrantedAuthority> authorities, Long id, String role, Set<Enterprise> enterprises) {
         super(username, password, authorities);
         this.id = id;
+        this.role = role;
         this.enterprises = enterprises;
     }
 
@@ -67,14 +67,6 @@ public class Manager extends User {
         this.name = name;
     }
 
-    public Integer getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Integer salary) {
-        this.salary = salary;
-    }
-
     public Long getId() {
         return id;
     }
@@ -90,5 +82,13 @@ public class Manager extends User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

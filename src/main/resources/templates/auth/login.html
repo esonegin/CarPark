@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login page</title>
+</head>
+<body>
+
+<h5>Тайм зона клиента: <span th:text="${clientTimezone}">Таймзона клиента</span></h5>
+
+<form name="f" method="post" action="/process_login">
+    <!-- CSRF-токен -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <label for="username">Введите имя пользователя: </label>
+    <input type="text" name="username" id="username"/>
+    <br/>
+    <label for="password">Введите пароль: </label>
+    <input type="password" name="password" id="password"/>
+    <br/>
+    <!-- Скрытое поле для передачи таймзоны -->
+    <input type="hidden" name="timezone" id="timezone"/>
+
+    <input type="submit" value="Login"/>
+
+    <div th:if="${param.error}" style="color: red">
+        Неправильные имя или пароль
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Отправка таймзоны после успешной авторизации
+        const sendTimezone = () => {
+            fetch('/set-timezone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ timezone: timezone })
+            })
+                .then(response => console.log("Таймзона сохранена:", timezone))
+                .catch(error => console.error("Ошибка сохранения таймзоны:", error));
+        };
+
+        // Добавляем событие на успешную авторизацию
+        const form = document.querySelector('form');
+        form.addEventListener('submit', () => {
+            sendTimezone();
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -9,6 +9,5 @@ import java.util.Set;
 
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
-
     Set<Enterprise> findByManagers_Id(Long managerId);
 }

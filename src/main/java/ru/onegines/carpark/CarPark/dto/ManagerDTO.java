@@ -8,49 +8,46 @@ import java.util.List;
  */
 public class ManagerDTO {
     private Long id;
-    private String manager_name;
-    private Integer manager_salary;
+    private String managerName;
+    private Integer managerSalary;
     private List<Long> allEnterpiseId;
     private List<Long> allDriversId;
     private List<Long> allCarsId;
 
-    public ManagerDTO(Long id, String manager_name, Integer manager_salary, List<Long> allEnterpiseId, List<Long> allDriversId, List<Long> allCarsId) {
+    public ManagerDTO(Long id, String managerName) {
         this.id = id;
-        this.manager_name = manager_name;
-        this.manager_salary = manager_salary;
+        this.managerName = managerName;
+        this.managerSalary = managerSalary;
         this.allEnterpiseId = allEnterpiseId;
         this.allDriversId = allDriversId;
         this.allCarsId = allCarsId;
     }
 
-
+    public ManagerDTO(Long id, String username, List<Long> allInterprisesId, List<Long> allDriversId, List<Long> allCarsId) {
+    }
 
     public Long getId() {
         return id;
     }
 
-    public void setManager_id(Long id) {
-        this.id = id;
-    }
-
-    public String getManager_name() {
-        return manager_name;
-    }
-
-    public void setManager_name(String manager_name) {
-        this.manager_name = manager_name;
-    }
-
-    public Integer getManager_salary() {
-        return manager_salary;
-    }
-
-    public void setManager_salary(Integer manager_salary) {
-        this.manager_salary = manager_salary;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
+    public Integer getManagerSalary() {
+        return managerSalary;
+    }
+
+    public void setManagerSalary(Integer managerSalary) {
+        this.managerSalary = managerSalary;
     }
 
     public List<Long> getAllEnterpiseId() {
@@ -76,4 +73,6 @@ public class ManagerDTO {
     public void setAllCarsId(List<Long> allCarsId) {
         this.allCarsId = allCarsId;
     }
+
+
 }

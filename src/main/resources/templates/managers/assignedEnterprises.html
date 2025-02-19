@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Предприятия менеджера</title>
+</head>
+<body>
+<h1>Предприятия менеджера</h1>
+<ul>
+    <li th:each="enterprise : ${enterprises}">
+        <a th:href="@{/managers/{managerId}/enterprises/{enterpriseId}(managerId=${manager.getId()}, enterpriseId=${enterprise.getEnterpriseId()})}"
+           th:text="${enterprise.getEnterpriseName()}"></a>
+    </li>
+</ul>
+</body>
+</html>
