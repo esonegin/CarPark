@@ -20,5 +20,6 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
 
     List<Route> findByCarIdAndStartTimeUtcBetween(Long carId, ZonedDateTime start, ZonedDateTime end);
 
+    List<Route> findByCarId(Long carId);
 }
 

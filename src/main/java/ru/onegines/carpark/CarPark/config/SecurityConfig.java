@@ -36,34 +36,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Ранее закомментированное добавление фильтра
-
-                /*.csrf(csrf -> csrf.ignoringRequestMatchers("/set-timezone"))
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/route/**"))*/
-                .csrf(csrf -> csrf.disable())
-                //.addFilterAfter(new TimeZoneFilter(), UsernamePasswordAuthenticationFilter.class) // Добавляем TimeZoneFilter после аутентификации;
-                /*.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/route/generate/**").permitAll()
-                        .requestMatchers("/set-timezone").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/managers/{managerId}/enterprises/{enterpriseId}/cars").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/track-generator/start/**").hasAuthority("MANAGER")
-                        .requestMatchers(HttpMethod.PATCH, "/cars/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.POST, "/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PUT, "/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.PATCH, "/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.DELETE, "/managers/**").hasRole("MANAGER")
-                        .requestMatchers("/process_login", "/track-viewer.html", "/static/**", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/auth/login", "/error").permitAll()
-                        .requestMatchers("/enterprises").hasRole("MANAGER")
-                        .anyRequest().authenticated()
-                )*/
-
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers("/auth/login", "/process_login").permitAll() // Разрешаем доступ к логину
+                        .anyRequest().authenticated() // Остальные запросы только для авторизованных
                 )
-
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/process_login")
@@ -74,18 +50,18 @@ public class SecurityConfig {
                             response.sendRedirect("/managers/" + managerId + "/enterprises");
                         })
                         .failureHandler((request, response, exception) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.sendRedirect("/auth/login?error"); // Редирект на логин при ошибке
                         })
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> response.sendRedirect("/auth/login"))
+                        .logoutSuccessUrl("/auth/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/auth/login");
+                            response.sendRedirect("/auth/login"); // Перенаправляем на логин, если неавторизован
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

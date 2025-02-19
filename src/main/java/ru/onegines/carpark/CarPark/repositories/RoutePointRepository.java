@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.RoutePoint;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,11 @@ public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
     // Находит последнюю точку маршрута с валидным адресом, отсортированную по времени в порядке убывания
     Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(Long routeId, List<String> invalidAddresses);
 
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdAsc(Long routeId, List<String> excludedAddresses);
+
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdDesc(Long routeId, List<String> excludedAddresses);
+
+    Optional<RoutePoint> findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(Long carId, ZonedDateTime start, ZonedDateTime end);
+
+    Optional<RoutePoint> findLastByCarIdAndTimestampUtcBetweenOrderByTimestampUtcDesc(Long carId, ZonedDateTime start, ZonedDateTime end);
 }

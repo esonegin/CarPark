@@ -45,6 +45,7 @@ public class EnterpriseService {
         return enterprise.orElse(null);
     }
 
+
     @Transactional
     public void save(Enterprise enterprise) {
         enterpriseRepository.save(enterprise);
@@ -139,6 +140,7 @@ public class EnterpriseService {
     public String getEnterpriseTimeZone(Long enterpriseId) {
         return findById(enterpriseId).getTimeZone();
     }
+
 
     /*public List<Enterprise> generateEnterprises(int enterpriseCount, int carCountPerEnterprise) {
         List<Enterprise> enterprises = new ArrayList<>();

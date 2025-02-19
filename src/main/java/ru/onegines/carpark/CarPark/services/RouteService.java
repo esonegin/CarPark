@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.onegines.carpark.CarPark.dto.RouteDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Enterprise;
@@ -124,14 +127,17 @@ public class RouteService {
     public List<RouteDTO> getTrips(Long carId, String start, String end) {
         // Получаем отформатированные даты
         HashMap<String, ZonedDateTime> formattedDates = getZoneStartAnEndTime(carId, start, end);
+
         // Получаем список маршрутов в заданном диапазоне
-        List<Route> routes = routeRepository.findByCarIdAndStartTimeUtcBetween(carId, formattedDates.get("start"), formattedDates.get("end"));
+        List<Route> routes = routeRepository.findByCarIdAndStartTimeUtcBetween(
+                carId, formattedDates.get("start"), formattedDates.get("end")
+        );
 
         // Преобразуем маршруты в RouteDTO
         return routes.stream()
                 .map(route -> {
                     try {
-                        // Извлекаем названия улиц для начальной и конечной точек из таблицы route_points
+                        // Извлекаем названия улиц для начальной и конечной точек
                         String startAddress = findFirstValidAddressByRouteId(route.getId());
                         String endAddress = findLastValidAddressByRouteId(route.getId());
 
@@ -140,17 +146,18 @@ public class RouteService {
                                 route.getId(),
                                 startAddress,
                                 endAddress,
-                                route.getStartTimeUtc(),
-                                route.getEndTimeUtc()
+                                route.getStartTimeUtc() != null ? route.getStartTimeUtc().toString() : "Неизвестно",
+                                route.getEndTimeUtc() != null ? route.getEndTimeUtc().toString() : "Неизвестно"
                         );
                     } catch (Exception e) {
                         // Логируем ошибки
-                        logger.error("Ошибка при обработке маршрута: {}", e.getMessage());
+                        logger.error("Ошибка при обработке маршрута ID {}: {}", route.getId(), e.getMessage());
                         throw new RuntimeException("Ошибка при обработке маршрута", e);
                     }
                 })
                 .toList();
     }
+
 
     private String findFirstValidAddressByRouteId(Long routeId) {
         // Находим первую точку маршрута с валидным адресом
@@ -204,6 +211,42 @@ public class RouteService {
         }
 
         return null;
+    }
+
+    public Map<String, Object> requestFromOpenRouteService(Long carId, ZonedDateTime start, ZonedDateTime end) {
+        try {
+            // Находим первую и последнюю точки маршрута
+            Optional<RoutePoint> startPointOptional = routePointRepository.findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(carId, start, end);
+            Optional<RoutePoint> endPointOptional = routePointRepository.findLastByCarIdAndTimestampUtcBetweenOrderByTimestampUtcDesc(carId, start, end);
+
+            if (startPointOptional.isEmpty() || endPointOptional.isEmpty()) {
+                throw new IllegalArgumentException("Точки маршрута не найдены.");
+            }
+
+            RoutePoint startPoint = startPointOptional.get();
+            RoutePoint endPoint = endPointOptional.get();
+
+            // Формируем URL для OpenRouteService API
+            String openRouteServiceUrl = UriComponentsBuilder.fromHttpUrl("https://api.openrouteservice.org/v2/directions/driving-car")
+                    .queryParam("api_key", "YOUR_API_KEY") // Замените YOUR_API_KEY на ваш ключ
+                    .queryParam("start", startPoint.getPoint().getX() + "," + startPoint.getPoint().getY())
+                    .queryParam("end", endPoint.getPoint().getX() + "," + endPoint.getPoint().getY())
+                    .toUriString();
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(openRouteServiceUrl, String.class);
+
+            // Разбор JSON-ответа
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("features", rootNode.path("features")); // Сохраняем массив маршрутов
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при запросе к OpenRouteService: " + e.getMessage(), e);
+        }
     }
 }
 

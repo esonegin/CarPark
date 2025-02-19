@@ -1,85 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Менеджер</title>
+    <title>Предприятия менеджера</title>
 </head>
 <body>
-<h1>Информация о менеджере</h1>
-<p th:text="${'ID: ' + manager.id}">VALUE</p>
-<p th:text="${'Имя менеджера: ' + manager.managerName}">VALUE</p>
-
-<h2>Доступные предприятия</h2>
-<div id="enterprises">
-    <ul th:each="enterprise : ${enterprises}">
-        <li>
-            <h4 th:text="${enterprise.enterpriseName}">Enterprise Name</h4>
-            <h5>Тайм зона предприятия: <span th:text="${enterprise.timeZone}">Таймзона</span></h5>
-            <h5>Тайм зона клиента: <span th:text="${clientTimezone}">Таймзона клиента</span></h5>
-            <span id="client-timezone" th:text="${clientTimezone}" style="display:none;"></span>
-
-            <h4>Автомобили:</h4>
-            <ul th:if="${carsByEnterprise.get(enterprise.enterpriseId) != null}"
-                th:each="car : ${carsByEnterprise.get(enterprise.enterpriseId)}">
-                <li>
-                    <span>ID автомобиля: <span th:text="${car.carId}"></span></span><br/>
-                    <span>ID бренда автомобиля: <span th:text="${car.brandId}"></span></span><br/>
-                    <span>Номер автомобиля: <span th:text="${car.number}"></span></span><br/>
-                    <p>
-                        <span>Дата покупки (таймзона предприятия): </span>
-                        <span th:text="${car.enterprisePurchaseDateTime != null ? car.enterprisePurchaseDateTime : 'Дата не задана'}"></span>
-                    </p>
-                    <p>
-                        <span>Дата покупки (таймзона клиента): </span>
-                        <span th:text="${car.purchaseDateTime != null ? car.purchaseDateTime : 'Дата не задана'}"></span>
-                    </p>
-
-
-
-                    <form th:action="@{/managers/{managerId}/enterprises/{enterpriseId}/cars/{carId}/edit(managerId=${manager.id}, enterpriseId=${enterprise.enterpriseId}, carId=${car.carId})}"
-                          method="get" style="display:inline;">
-                        <button type="submit" style="color: blue;">Редактировать</button>
-                    </form>
-                    <form th:action="@{/managers/{managerId}/enterprises/{enterpriseId}/cars/{carId}(managerId=${manager.id}, enterpriseId=${enterprise.enterpriseId}, carId=${car.carId})}"
-                          method="post" style="display:inline;">
-                        <input type="hidden" name="_method" value="delete"/>
-                        <button type="submit" style="color: red;">Удалить</button>
-                    </form>
-                </li>
-            </ul>
-
-            <h4>Добавить новый автомобиль:</h4>
-            <form th:action="@{/managers/{managerId}/enterprises/{enterpriseId}/cars(managerId=${manager.id}, enterpriseId=${enterprise.enterpriseId})}"
-                  th:object="${newCar}" method="post">
-                <label for="mileage">Введите пробег:</label>
-                <input type="text" th:field="*{mileage}" id="mileage"/>
-                <div style="color:red" th:if="${#fields.hasErrors('mileage')}" th:errors="*{mileage}"></div>
-                <br/>
-
-                <label for="годВыпуска">Введите год выпуска:</label>
-                <input type="text" th:field="*{годВыпуска}" id="годВыпуска"/>
-                <div style="color:red" th:if="${#fields.hasErrors('годВыпуска')}" th:errors="*{годВыпуска}"></div>
-                <br/>
-
-                <label for="reserve">Введите запас хода:</label>
-                <input type="text" th:field="*{reserve}" id="reserve"/>
-                <div style="color:red" th:if="${#fields.hasErrors('reserve')}" th:errors="*{reserve}"></div>
-                <br/>
-
-                <label for="number">Введите номер автомобиля:</label>
-                <input type="text" th:field="*{number}" id="number"/>
-                <div style="color:red" th:if="${#fields.hasErrors('number')}" th:errors="*{number}"></div>
-                <br/>
-
-                <label for="brand">Выберите бренд:</label>
-                <select name="brandId" id="brand">
-                    <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name}"></option>
-                </select>
-                <br/>
-                <button type="submit">Добавить автомобиль</button>
-            </form>
-        </li>
-    </ul>
-</div>
+<h1>Предприятия менеджера</h1>
+<ul>
+    <li th:each="enterprise : ${enterprises}">
+        <a th:href="@{/managers/{managerId}/enterprises/{enterpriseId}(managerId=${manager.getId()}, enterpriseId=${enterprise.getEnterpriseId()})}"
+           th:text="${enterprise.getEnterpriseName()}"></a>
+    </li>
+</ul>
 </body>
 </html>

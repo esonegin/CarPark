@@ -13,15 +13,37 @@ public class RouteDTO {
     private Long id;
     private String startAddress;
     private String endAddress;
-    private String startTime;
-    private String endTime;
+    private String startTimeUtc;
+    private String endTimeUtc;
 
-    public RouteDTO(Long id, String startAddress, String endAddress, ZonedDateTime startTime, ZonedDateTime endTime) {
+    // Полный конструктор
+    public RouteDTO(Long id, String startAddress, String endAddress, String startTimeUtc, String endTimeUtc) {
         this.id = id;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
-        this.startTime = startTime.toString();
-        this.endTime = endTime.toString();
+        this.startTimeUtc = startTimeUtc;
+        this.endTimeUtc = endTimeUtc;
+    }
+
+    // Сеттеры и геттеры
+    public Long getId() {
+        return id;
+    }
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public String getEndAddress() {
+        return endAddress;
+    }
+
+    public String getStartTimeUtc() {
+        return startTimeUtc;
+    }
+
+    public String getEndTimeUtc() {
+        return endTimeUtc;
     }
 
     public void setId(Long id) {
@@ -36,32 +58,13 @@ public class RouteDTO {
         this.endAddress = endAddress;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setStartTimeUtc(String startTimeUtc) {
+        this.startTimeUtc = startTimeUtc;
     }
 
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getStartAddress() {
-        return startAddress;
-    }
-
-    public String getEndAddress() {
-        return endAddress;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
+    public void setEndTimeUtc(String endTimeUtc) {
+        this.endTimeUtc = endTimeUtc;
     }
 }
+
 

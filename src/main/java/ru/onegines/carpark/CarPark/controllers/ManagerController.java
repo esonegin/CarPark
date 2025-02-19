@@ -7,12 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.onegines.carpark.CarPark.dto.CarDTO;
 import ru.onegines.carpark.CarPark.dto.EnterpriseDTO;
 import ru.onegines.carpark.CarPark.dto.ManagerDTO;
+import ru.onegines.carpark.CarPark.dto.RouteDTO;
 import ru.onegines.carpark.CarPark.models.Brand;
+import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.models.Manager;
 import ru.onegines.carpark.CarPark.repositories.BrandRepository;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -98,6 +102,81 @@ public class ManagerController {
         return "managers/assignedEnterprises";
     }
 
+    @GetMapping("/{managerId}/enterprises/{enterpriseId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public String showEnterpriseCars(@PathVariable Long managerId,
+                                     @PathVariable Long enterpriseId,
+                                     Model model) {
+        Enterprise enterprise = enterpriseService.findById(enterpriseId);
+        List<CarDTO> cars = carService.getCarsByEnterprise(enterpriseId);
+
+        model.addAttribute("enterprise", enterprise);
+        model.addAttribute("cars", cars);
+        model.addAttribute("managerId", managerId);
+
+        return "managers/enterpriseCars";  // Имя Thymeleaf-шаблона
+    }
+
+
+    @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public String showCarDetails(@PathVariable Long managerId,
+                                 @PathVariable Long enterpriseId,
+                                 @PathVariable Long carId,
+                                 Model model) {
+        CarDTO car = carService.getCarDTO(carId);
+        List<RouteDTO> trips = carService.getTripsByCar(carId);
+
+        model.addAttribute("car", car);
+        model.addAttribute("trips", trips);
+        model.addAttribute("managerId", managerId);
+        model.addAttribute("enterpriseId", enterpriseId);
+
+        return "managers/carDetails";  // Имя Thymeleaf-шаблона
+    }
+
+    @GetMapping("/map/route")
+    public String showRouteOnMap(
+            @RequestParam Long carId,
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end,
+            Model model
+    ) {
+        try {
+            // Проверяем, что автомобиль существует
+            Car car = carService.findById(carId);
+            if (car == null) {
+                throw new IllegalArgumentException("Автомобиль с ID " + carId + " не найден.");
+            }
+
+            // Логируем параметры
+            System.out.println("Car ID: " + carId);
+            System.out.println("Start time: " + start);
+            System.out.println("End time: " + end);
+
+            // Если параметры start или end не указаны, используем текущее время
+            if (StringUtils.isEmpty(start)) {
+                start = ZonedDateTime.now().minusHours(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            }
+            if (StringUtils.isEmpty(end)) {
+                end = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            }
+
+            // Добавляем данные в модель
+            model.addAttribute("carId", carId); // ID автомобиля
+            model.addAttribute("start", start); // Начальная дата
+            model.addAttribute("end", end);   // Конечная дата
+
+            return "map/route_map"; // Возвращаем шаблон карты
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "error/errorPage";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "Ошибка при загрузке маршрута: " + e.getMessage());
+            return "error/errorPage";
+        }
+    }
 
 
     @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}/edit")

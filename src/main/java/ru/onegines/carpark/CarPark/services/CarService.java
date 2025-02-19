@@ -4,19 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.dto.CarDTO;
+import ru.onegines.carpark.CarPark.dto.RouteDTO;
 import ru.onegines.carpark.CarPark.exceptions.ResourceNotFoundException;
-import ru.onegines.carpark.CarPark.models.Brand;
-import ru.onegines.carpark.CarPark.models.Car;
-import ru.onegines.carpark.CarPark.models.Driver;
-import ru.onegines.carpark.CarPark.models.Enterprise;
-import ru.onegines.carpark.CarPark.repositories.BrandRepository;
-import ru.onegines.carpark.CarPark.repositories.CarRepository;
-import ru.onegines.carpark.CarPark.repositories.DriverRepository;
-import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
+import ru.onegines.carpark.CarPark.models.*;
+import ru.onegines.carpark.CarPark.repositories.*;
 import ru.onegines.carpark.CarPark.utils.DateTimeUtil;
 
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,10 +31,11 @@ public class CarService {
     public final BrandService brandService;
     public final BrandRepository brandRepository;
     public final EnterpriseRepository enterpriseRepository;
-    DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_INSTANT;
+    public final RouteRepository routeRepository;
+    public final RoutePointRepository routePointRepository;
 
     @Autowired
-    public CarService(CarRepository carRepository, DriverRepository driverRepository, DriverService driverService, EnterpriseService enterpriseService, BrandService brandService, BrandRepository brandRepository, EnterpriseRepository enterpriseRepository) {
+    public CarService(CarRepository carRepository, DriverRepository driverRepository, DriverService driverService, EnterpriseService enterpriseService, BrandService brandService, BrandRepository brandRepository, EnterpriseRepository enterpriseRepository, RouteRepository routeRepository, RoutePointRepository routePointRepository) {
         this.carRepository = carRepository;
         this.driverRepository = driverRepository;
         this.driverService = driverService;
@@ -47,6 +43,8 @@ public class CarService {
         this.brandService = brandService;
         this.brandRepository = brandRepository;
         this.enterpriseRepository = enterpriseRepository;
+        this.routeRepository = routeRepository;
+        this.routePointRepository = routePointRepository;
     }
 
     public List<Car> findAll() {
@@ -255,4 +253,37 @@ public class CarService {
 
                 .collect(Collectors.groupingBy(CarDTO::getEnterpriseId));
     }
+
+    public List<RouteDTO> getTripsByCar(Long carId) {
+        List<Route> trips = routeRepository.findByCarId(carId);
+
+        if (trips == null || trips.isEmpty()) {
+            System.out.println("Нет поездок для машины ID " + carId);
+            return Collections.emptyList();
+        }
+
+        return trips.stream()
+                .map(trip -> new RouteDTO(
+                        trip.getId(),
+                        getStartAddress(trip.getId()),  // Получаем начальный адрес
+                        getEndAddress(trip.getId()),    // Получаем конечный адрес
+                        trip.getStartTimeUtc() != null ? trip.getStartTimeUtc().toString() : "Неизвестно",
+                        trip.getEndTimeUtc() != null ? trip.getEndTimeUtc().toString() : "Неизвестно"
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public String getStartAddress(Long routeId) {
+        return routePointRepository.findFirstByRouteIdAndAddressNotInOrderByIdAsc(
+                routeId, List.of("-", "Адрес не найден")
+        ).map(RoutePoint::getAddress).orElse("Неизвестно");
+    }
+
+    public String getEndAddress(Long routeId) {
+        return routePointRepository.findFirstByRouteIdAndAddressNotInOrderByIdDesc(
+                routeId, List.of("-", "Адрес не найден")
+        ).map(RoutePoint::getAddress).orElse("Неизвестно");
+    }
+
+
 }
