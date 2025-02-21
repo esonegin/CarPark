@@ -88,6 +88,11 @@ public class RouteService {
         // Логирование для отладки
         System.out.println("Диапазон дат: " + formattedDates.get("start") + " - " + formattedDates.get("end"));
         System.out.println("Найденные маршруты: " + routes);
+        // Выводим только id маршрутов
+        List<Long> routeIds = routes.stream()
+                .map(Route::getId)  // Преобразуем каждый Route в его id
+                .collect(Collectors.toList());  // Собираем в список
+        System.out.println("Найденные маршруты (ID): " + routeIds);
 
         if (routes.isEmpty()) {
             throw new IllegalArgumentException("Нет маршрутов в заданном диапазоне.");
@@ -144,11 +149,10 @@ public class RouteService {
                         // Создаем RouteDTO
                         return new RouteDTO(
                                 route.getId(),
-                                startAddress,
-                                endAddress,
-                                route.getStartTimeUtc() != null ? route.getStartTimeUtc().toString() : "Неизвестно",
-                                route.getEndTimeUtc() != null ? route.getEndTimeUtc().toString() : "Неизвестно"
-                        );
+                                startAddress,  // Получаем начальный адрес
+                                endAddress,    // Получаем конечный адрес
+                                route.getStartTimeUtc(),
+                                route.getEndTimeUtc());
                     } catch (Exception e) {
                         // Логируем ошибки
                         logger.error("Ошибка при обработке маршрута ID {}: {}", route.getId(), e.getMessage());

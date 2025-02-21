@@ -9,8 +9,11 @@
 <h2>Список поездок</h2>
 <ul>
     <li th:each="trip : ${trips}">
-        <a th:href="@{/map/route(start=${trip.startTimeUtc}, end=${trip.endTimeUtc}, carId=${car.carId})}">
-            Поездка [[${trip.id}]] (с [[${trip.startTimeUtc}]] до [[${trip.endTimeUtc}]])
+        <a th:href="@{/map/route(carId=${car.carId},
+                          start=${#temporals.format(trip.startTimeUtc, 'yyyy-MM-dd''T''HH:mm')},
+                          end=${#temporals.format(trip.endTimeUtc, 'yyyy-MM-dd''T''HH:mm')})}"
+           th:onclick="setFormValuesAndLoadRoute([[${car.carId}]], '[[${#temporals.format(trip.startTimeUtc, 'yyyy-MM-dd''T''HH:mm:ss.SSS')}]]', '[[${#temporals.format(trip.endTimeUtc, 'yyyy-MM-dd''T''HH:mm:ss.SSS')}]]'); return false;">
+            Поездка [[${trip.id}]] (с [[${#temporals.format(trip.startTimeUtc, 'yyyy-MM-dd HH:mm')}]] до [[${#temporals.format(trip.endTimeUtc, 'yyyy-MM-dd HH:mm')}]])
         </a>
         <br>
         <span>Начало: [[${trip.startAddress}]]</span><br>
@@ -20,5 +23,28 @@
 
 <br>
 <a th:href="@{'/managers/' + ${managerId} + '/enterprises/' + ${enterpriseId} + '/cars'}">Назад</a>
+
+<script>
+    function setFormValuesAndLoadRoute(carId, startTime, endTime) {
+        // Преобразуем строки времени в объекты Date
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+
+        // Округляем startDate в меньшую сторону (отбрасываем секунды и миллисекунды)
+        startDate.setSeconds(0, 0); // Устанавливаем секунды и миллисекунды в 0
+        const roundedStartTime = startDate.toISOString().slice(0, 16); // Обрезаем до минут
+
+        // Округляем endDate в большую сторону (добавляем 1 минуту, если есть секунды или миллисекунды)
+        if (endDate.getSeconds() > 0 || endDate.getMilliseconds() > 0) {
+            endDate.setMinutes(endDate.getMinutes() + 1); // Добавляем 1 минуту
+        }
+        endDate.setSeconds(0, 0); // Устанавливаем секунды и миллисекунды в 0
+        const roundedEndTime = endDate.toISOString().slice(0, 16); // Обрезаем до минут
+
+        // Перенаправляем на нужный маршрут с округленными значениями
+        window.location.href = `/map/route?carId=${carId}&start=${roundedStartTime}&end=${roundedEndTime}`;
+    }
+</script>
+
 </body>
 </html>

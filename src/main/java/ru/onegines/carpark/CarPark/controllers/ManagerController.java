@@ -125,7 +125,7 @@ public class ManagerController {
                                  @PathVariable Long carId,
                                  Model model) {
         CarDTO car = carService.getCarDTO(carId);
-        List<RouteDTO> trips = carService.getTripsByCar(carId);
+        List<RouteDTO> trips = carService.getTripsByCar(carId, enterpriseId);  // Передаем enterpriseId
 
         model.addAttribute("car", car);
         model.addAttribute("trips", trips);
@@ -134,50 +134,6 @@ public class ManagerController {
 
         return "managers/carDetails";  // Имя Thymeleaf-шаблона
     }
-
-    @GetMapping("/map/route")
-    public String showRouteOnMap(
-            @RequestParam Long carId,
-            @RequestParam(required = false) String start,
-            @RequestParam(required = false) String end,
-            Model model
-    ) {
-        try {
-            // Проверяем, что автомобиль существует
-            Car car = carService.findById(carId);
-            if (car == null) {
-                throw new IllegalArgumentException("Автомобиль с ID " + carId + " не найден.");
-            }
-
-            // Логируем параметры
-            System.out.println("Car ID: " + carId);
-            System.out.println("Start time: " + start);
-            System.out.println("End time: " + end);
-
-            // Если параметры start или end не указаны, используем текущее время
-            if (StringUtils.isEmpty(start)) {
-                start = ZonedDateTime.now().minusHours(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-            }
-            if (StringUtils.isEmpty(end)) {
-                end = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-            }
-
-            // Добавляем данные в модель
-            model.addAttribute("carId", carId); // ID автомобиля
-            model.addAttribute("start", start); // Начальная дата
-            model.addAttribute("end", end);   // Конечная дата
-
-            return "map/route_map"; // Возвращаем шаблон карты
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error/errorPage";
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "Ошибка при загрузке маршрута: " + e.getMessage());
-            return "error/errorPage";
-        }
-    }
-
 
     @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}/edit")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
