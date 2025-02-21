@@ -53,38 +53,107 @@
 
     const spinner = document.getElementById("spinner");
 
-    // Обработчик клика по кнопке
-    document.getElementById("loadRouteButton").addEventListener("click", async () => {
-        const carId = document.getElementById("carIdInput").value.trim();
-        const startTime = document.getElementById("startTimeInput").value;
-        const endTime = document.getElementById("endTimeInput").value;
+    // Функция для получения параметров из URL
+    function getQueryParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const carId = urlParams.get('carId');
+        const start = urlParams.get('start');
+        const end = urlParams.get('end');
+        return { carId, start, end };
+    }
 
-        if (!carId || !startTime || !endTime) {
+    // Получаем параметры из URL
+    const { carId, start, end } = getQueryParams();
+
+    // Если параметры переданы, заполняем поля и имитируем клик по кнопке
+    if (carId && start && end) {
+        document.getElementById("carIdInput").value = carId;
+        document.getElementById("startTimeInput").value = new Date(start).toISOString().slice(0, 16); // Преобразуем дату в формат datetime-local
+        document.getElementById("endTimeInput").value = new Date(end).toISOString().slice(0, 16); // Преобразуем дату в формат datetime-local
+
+        // Имитация клика по кнопке
+        loadRoute(carId, start, end);
+    }
+
+    // Функция для округления времени
+    function roundToMinute(date, roundUp) {
+        const roundedDate = new Date(date);
+        roundedDate.setSeconds(0); // Убираем секунды
+        roundedDate.setMilliseconds(0); // Убираем миллисекунды
+
+        if (roundUp) {
+            // Если нужно округлить вверх, добавляем минуту
+            roundedDate.setMinutes(roundedDate.getMinutes() + 1);
+        }
+
+        return roundedDate;
+    }
+
+    // Обработчик клика по кнопке
+    document.getElementById("loadRouteButton").addEventListener("click", () => {
+        const carId = document.getElementById("carIdInput").value.trim();
+        const startTimeInput = document.getElementById("startTimeInput").value;
+        const endTimeInput = document.getElementById("endTimeInput").value;
+
+        if (!carId || !startTimeInput || !endTimeInput) {
             alert("Пожалуйста, заполните все поля!");
             return;
         }
 
+        // Преобразуем в объект Date
+        const startTime = new Date(startTimeInput);
+        const endTime = new Date(endTimeInput);
+
+        // Округляем время
+        const roundedStartTime = roundToMinute(startTime, false);
+        const roundedEndTime = roundToMinute(endTime, true);
+
+        // Преобразуем в строку формата YYYY-MM-DDTHH:MM (ISO без миллисекунд и без часового пояса)
+        const startTimeFormatted = roundToMinute(startTime, false);
+        const endTimeFormatted = roundToMinute(endTime, true);
+
+        loadRoute(carId, startTimeFormatted, endTimeFormatted);
+    });
+
+    function roundToMinute(date, roundUp) {
+        const roundedDate = new Date(date);
+        roundedDate.setSeconds(0);
+        roundedDate.setMilliseconds(0);
+
+        if (roundUp) {
+            roundedDate.setMinutes(roundedDate.getMinutes() + 1);
+        }
+
+        // Получаем строку в локальном формате
+        const year = roundedDate.getFullYear();
+        const month = String(roundedDate.getMonth() + 1).padStart(2, "0");
+        const day = String(roundedDate.getDate()).padStart(2, "0");
+        const hours = String(roundedDate.getHours()).padStart(2, "0");
+        const minutes = String(roundedDate.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`; // Без Z
+    }
+
+    // Функция загрузки маршрута
+    async function loadRoute(carId, startTime, endTime) {
         try {
             spinner.style.display = "block"; // Показываем спиннер
 
-            // Единый запрос к серверу
+            // Запрос к серверу
             const response = await fetch(`/route/filter?carId=${carId}&start=${startTime}&end=${endTime}`);
+
             if (!response.ok) {
                 throw new Error("Ошибка при запросе маршрута: " + response.statusText);
             }
 
             const data = await response.json();
 
-            // Проверяем, что данные содержат маршрут
             if (!data.routes || !data.routes[0] || !data.routes[0].geometry) {
-                throw new Error("Неполные данные получены от сервера");
+                throw new Error("Маршрут не найден.");
             }
 
-            // Декодируем маршрут из OpenRouteService
-            const polyline = data.routes[0].geometry; // Получаем полилинию из routes[0].geometry
+            const polyline = data.routes[0].geometry;
             const coordinates = decodePolyline(polyline);
-
-            // Отображение маршрута на карте
             displayRouteOnMap(coordinates);
         } catch (error) {
             console.error("Ошибка:", error);
@@ -92,7 +161,8 @@
         } finally {
             spinner.style.display = "none"; // Скрываем спиннер
         }
-    });
+    }
+
 
     // Декодирование полилинии
     function decodePolyline(polyline) {

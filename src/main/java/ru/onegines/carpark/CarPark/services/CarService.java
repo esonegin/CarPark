@@ -10,7 +10,10 @@ import ru.onegines.carpark.CarPark.models.*;
 import ru.onegines.carpark.CarPark.repositories.*;
 import ru.onegines.carpark.CarPark.utils.DateTimeUtil;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -254,7 +257,14 @@ public class CarService {
                 .collect(Collectors.groupingBy(CarDTO::getEnterpriseId));
     }
 
-    public List<RouteDTO> getTripsByCar(Long carId) {
+    public List<RouteDTO> getTripsByCar(Long carId, Long enterpriseId) {
+        // Получаем таймзону предприятия
+        String enterpriseTimeZone = enterpriseRepository.findTimeZoneById(enterpriseId);
+        if (enterpriseTimeZone == null) {
+            throw new IllegalArgumentException("Таймзона предприятия не найдена для ID: " + enterpriseId);
+        }
+
+        // Получаем поездки для машины
         List<Route> trips = routeRepository.findByCarId(carId);
 
         if (trips == null || trips.isEmpty()) {
@@ -262,14 +272,24 @@ public class CarService {
             return Collections.emptyList();
         }
 
+        // Преобразуем поездки с учетом таймзоны предприятия
         return trips.stream()
-                .map(trip -> new RouteDTO(
-                        trip.getId(),
-                        getStartAddress(trip.getId()),  // Получаем начальный адрес
-                        getEndAddress(trip.getId()),    // Получаем конечный адрес
-                        trip.getStartTimeUtc() != null ? trip.getStartTimeUtc().toString() : "Неизвестно",
-                        trip.getEndTimeUtc() != null ? trip.getEndTimeUtc().toString() : "Неизвестно"
-                ))
+                .map(trip -> {
+                    // Преобразуем время поездок в таймзону предприятия
+                    ZonedDateTime startTimeInEnterpriseZone = trip.getStartTimeUtc().withZoneSameInstant(ZoneId.of(enterpriseTimeZone));
+                    ZonedDateTime endTimeInEnterpriseZone = trip.getEndTimeUtc().withZoneSameInstant(ZoneId.of(enterpriseTimeZone));
+
+                    // Округляем endTimeUtc в большую сторону
+                    ZonedDateTime roundedEndTimeUtc = roundUpToNextMinute(endTimeInEnterpriseZone);
+
+                    return new RouteDTO(
+                            trip.getId(),
+                            getStartAddress(trip.getId()),  // Получаем начальный адрес
+                            getEndAddress(trip.getId()),    // Получаем конечный адрес
+                            startTimeInEnterpriseZone,      // Используем время в таймзоне предприятия
+                            roundedEndTimeUtc               // Используем округленное время окончания
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -285,5 +305,13 @@ public class CarService {
         ).map(RoutePoint::getAddress).orElse("Неизвестно");
     }
 
+    private ZonedDateTime roundUpToNextMinute(ZonedDateTime dateTime) {
+        if (dateTime.getSecond() > 0 || dateTime.getNano() > 0) {
+            // Добавляем 1 минуту и обнуляем секунды и наносекунды
+            return dateTime.plusMinutes(1).withSecond(0).withNano(0);
+        }
+        // Если секунды и наносекунды уже равны 0, возвращаем исходное значение
+        return dateTime;
+    }
 
 }

@@ -1,5 +1,7 @@
 package ru.onegines.carpark.CarPark.dto;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -13,11 +15,11 @@ public class RouteDTO {
     private Long id;
     private String startAddress;
     private String endAddress;
-    private String startTimeUtc;
-    private String endTimeUtc;
+    private ZonedDateTime startTimeUtc;
+    private ZonedDateTime endTimeUtc;
 
     // Полный конструктор
-    public RouteDTO(Long id, String startAddress, String endAddress, String startTimeUtc, String endTimeUtc) {
+    public RouteDTO(Long id, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
         this.id = id;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
@@ -38,11 +40,11 @@ public class RouteDTO {
         return endAddress;
     }
 
-    public String getStartTimeUtc() {
+    public ZonedDateTime getStartTimeUtc() {
         return startTimeUtc;
     }
 
-    public String getEndTimeUtc() {
+    public ZonedDateTime getEndTimeUtc() {
         return endTimeUtc;
     }
 
@@ -58,11 +60,11 @@ public class RouteDTO {
         this.endAddress = endAddress;
     }
 
-    public void setStartTimeUtc(String startTimeUtc) {
+    public void setStartTimeUtc(ZonedDateTime startTimeUtc) {
         this.startTimeUtc = startTimeUtc;
     }
 
-    public void setEndTimeUtc(String endTimeUtc) {
+    public void setEndTimeUtc(ZonedDateTime endTimeUtc) {
         this.endTimeUtc = endTimeUtc;
     }
 }
