@@ -39,7 +39,7 @@ public class Car {
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "enterprise_id", nullable = false) // Столбец для внешнего ключа
+    @JoinColumn(name = "enterprise_id", nullable = false) // Внешний ключ
     private Enterprise enterprise;
 
     @ManyToMany
@@ -48,6 +48,7 @@ public class Car {
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "driver_id")
     )
+
     private Set<Driver> drivers = new HashSet<>();
 
 

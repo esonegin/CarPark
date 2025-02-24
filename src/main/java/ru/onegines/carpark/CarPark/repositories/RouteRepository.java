@@ -22,4 +22,3 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
 
     List<Route> findByCarId(Long carId);
 }
-

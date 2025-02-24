@@ -107,9 +107,9 @@ public class RouteController {
 
     @GetMapping("/filter")
     public ResponseEntity<?> filterRoutesAndFetchDetails(
-            @RequestParam Long carId,
-            @RequestParam String start,
-            @RequestParam String end
+            @RequestParam("carId") Long carId, // Указываем имя параметра
+            @RequestParam("start") String start, // Указываем имя параметра
+            @RequestParam("end") String end // Указываем имя параметра
     ) {
         try {
             // Получаем данные от OpenRouteService
