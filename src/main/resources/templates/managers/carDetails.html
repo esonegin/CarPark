@@ -17,6 +17,9 @@
     <button type="button" onclick="filterTrips()">Отобрать</button>
 </form>
 
+<!-- Кнопка для объединенного маршрута -->
+<button type="button" onclick="loadCombinedRoute()">Объединенный маршрут</button>
+
 <h2>Список поездок</h2>
 <ul id="tripList">
     <li th:each="trip : ${trips}" class="trip-item"
@@ -74,6 +77,38 @@
                 trip.style.display = 'none';
             }
         });
+    }
+
+    function loadCombinedRoute() {
+        let minStart = null;
+        let maxEnd = null;
+        let carId = "[[${car.carId}]]";
+
+        document.querySelectorAll('.trip-item').forEach(trip => {
+            if (trip.style.display !== 'none') { // Только видимые поездки
+                const tripStart = new Date(trip.getAttribute('data-start'));
+                const tripEnd = new Date(trip.getAttribute('data-end'));
+
+                if (minStart === null || tripStart < minStart) {
+                    minStart = tripStart;
+                }
+                if (maxEnd === null || tripEnd > maxEnd) {
+                    maxEnd = tripEnd;
+                }
+            }
+        });
+
+        if (minStart === null || maxEnd === null) {
+            alert("Нет доступных поездок для объединения!");
+            return;
+        }
+
+        minStart.setSeconds(0, 0);
+        maxEnd.setSeconds(0, 0);
+        const roundedStart = minStart.toISOString().slice(0, 16);
+        const roundedEnd = maxEnd.toISOString().slice(0, 16);
+
+        window.location.href = `/map/route?carId=${carId}&start=${roundedStart}&end=${roundedEnd}`;
     }
 </script>
 
