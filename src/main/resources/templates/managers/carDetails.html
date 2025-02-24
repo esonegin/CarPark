@@ -6,9 +6,23 @@
 <body>
 <h1>Детали машины</h1>
 
+<!-- Форма для фильтрации поездок -->
+<form id="filterForm">
+    <label for="startFilter">Начало:</label>
+    <input type="datetime-local" id="startFilter" required />
+
+    <label for="endFilter">Конец:</label>
+    <input type="datetime-local" id="endFilter" required />
+
+    <button type="button" onclick="filterTrips()">Отобрать</button>
+</form>
+
 <h2>Список поездок</h2>
-<ul>
-    <li th:each="trip : ${trips}">
+<ul id="tripList">
+    <li th:each="trip : ${trips}" class="trip-item"
+        th:data-start="${#temporals.format(trip.startTimeUtc, 'yyyy-MM-dd''T''HH:mm:ss')}"
+        th:data-end="${#temporals.format(trip.endTimeUtc, 'yyyy-MM-dd''T''HH:mm:ss')}">
+
         <a th:href="@{/map/route(carId=${car.carId},
                           start=${#temporals.format(trip.startTimeUtc, 'yyyy-MM-dd''T''HH:mm')},
                           end=${#temporals.format(trip.endTimeUtc, 'yyyy-MM-dd''T''HH:mm')})}"
@@ -26,23 +40,40 @@
 
 <script>
     function setFormValuesAndLoadRoute(carId, startTime, endTime) {
-        // Преобразуем строки времени в объекты Date
         const startDate = new Date(startTime);
         const endDate = new Date(endTime);
 
-        // Округляем startDate в меньшую сторону (отбрасываем секунды и миллисекунды)
-        startDate.setSeconds(0, 0); // Устанавливаем секунды и миллисекунды в 0
-        const roundedStartTime = startDate.toISOString().slice(0, 16); // Обрезаем до минут
+        startDate.setSeconds(0, 0);
+        const roundedStartTime = startDate.toISOString().slice(0, 16);
 
-        // Округляем endDate в большую сторону (добавляем 1 минуту, если есть секунды или миллисекунды)
         if (endDate.getSeconds() > 0 || endDate.getMilliseconds() > 0) {
-            endDate.setMinutes(endDate.getMinutes() + 1); // Добавляем 1 минуту
+            endDate.setMinutes(endDate.getMinutes() + 1);
         }
-        endDate.setSeconds(0, 0); // Устанавливаем секунды и миллисекунды в 0
-        const roundedEndTime = endDate.toISOString().slice(0, 16); // Обрезаем до минут
+        endDate.setSeconds(0, 0);
+        const roundedEndTime = endDate.toISOString().slice(0, 16);
 
-        // Перенаправляем на нужный маршрут с округленными значениями
         window.location.href = `/map/route?carId=${carId}&start=${roundedStartTime}&end=${roundedEndTime}`;
+    }
+
+    function filterTrips() {
+        const startFilter = new Date(document.getElementById('startFilter').value);
+        const endFilter = new Date(document.getElementById('endFilter').value);
+
+        if (isNaN(startFilter.getTime()) || isNaN(endFilter.getTime())) {
+            alert("Пожалуйста, выберите корректные даты!");
+            return;
+        }
+
+        document.querySelectorAll('.trip-item').forEach(trip => {
+            const tripStart = new Date(trip.getAttribute('data-start'));
+            const tripEnd = new Date(trip.getAttribute('data-end'));
+
+            if (tripStart >= startFilter && tripEnd <= endFilter) {
+                trip.style.display = '';
+            } else {
+                trip.style.display = 'none';
+            }
+        });
     }
 </script>
 

@@ -15,7 +15,7 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "car_id")
+    @Column(name = "car_id", nullable = false)
     private Long carId;
 
     @Column(name = "start_time_utc", columnDefinition = "TIMESTAMP WITH TIME ZONE")
