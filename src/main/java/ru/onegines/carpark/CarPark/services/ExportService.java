@@ -41,7 +41,7 @@ public class ExportService {
         this.objectMapper = objectMapper;
     }
 
-    public String exportToCsv(Long enterpriseId, LocalDate startDate, LocalDate endDate) {
+    public String exportToCsv(UUID enterpriseId, LocalDate startDate, LocalDate endDate) {
         StringWriter writer = new StringWriter();
         try {
             writer.write('\uFEFF'); // Добавляем BOM для корректного отображения UTF-8 в Excel
@@ -82,7 +82,7 @@ public class ExportService {
 
 
 
-    public String exportToJson(Long enterpriseId, LocalDate startDate, LocalDate endDate) {
+    public String exportToJson(UUID enterpriseId, LocalDate startDate, LocalDate endDate) {
         Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
                 .orElseThrow(() -> new IllegalArgumentException("Предприятие не найдено с ID: " + enterpriseId));
 
@@ -148,7 +148,7 @@ public class ExportService {
 
 
 
-    private List<RouteDTO> getTripsByCar(Long carId, Long enterpriseId, LocalDate startDate, LocalDate endDate) {
+    private List<RouteDTO> getTripsByCar(Long carId, UUID enterpriseId, LocalDate startDate, LocalDate endDate) {
         // Проверяем, принадлежит ли машина данному enterpriseId
         Optional<Car> carOptional = carRepository.findById(carId);
         if (carOptional.isEmpty() || !carOptional.get().getEnterprise().getId().equals(enterpriseId)) {

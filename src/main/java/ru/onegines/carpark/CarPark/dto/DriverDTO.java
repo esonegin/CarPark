@@ -1,6 +1,7 @@
 package ru.onegines.carpark.CarPark.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -10,11 +11,11 @@ public class DriverDTO {
     private Long driver_id; // ID автомобиля
     private String driver_name; // ID бренда
     private int driver_salary;
-    private Long enterprise_id;
+    private UUID enterprise_id;
     private List<Long> carIds;
     //private Long activeCar_id;
 
-    public DriverDTO(Long driver_id, String driver_name, int driver_salary, Long enterprise_id, List<Long> carIds/*, Long activeCar_id*/) {
+    public DriverDTO(Long driver_id, String driver_name, int driver_salary, UUID enterprise_id, List<Long> carIds/*, Long activeCar_id*/) {
         this.driver_id = driver_id;
         this.driver_name = driver_name;
         this.driver_salary = driver_salary;
@@ -59,11 +60,11 @@ public class DriverDTO {
         this.carIds = carIds;
     }
 
-    public Long getEnterprise_id() {
+    public UUID getEnterprise_id() {
         return enterprise_id;
     }
 
-    public void setEnterprise_id(Long enterprise_id) {
+    public void setEnterprise_id(UUID enterprise_id) {
         this.enterprise_id = enterprise_id;
     }
 

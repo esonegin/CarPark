@@ -3,6 +3,7 @@ package ru.onegines.carpark.CarPark.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -17,14 +18,14 @@ public class CarDTO {
     private String number;
     private Long activeDriverId;
     private List<Long> allDriversId;
-    private Long enterpriseId;
+    private UUID enterpriseId;
     private LocalDateTime purchaseDateTime;
     private LocalDateTime enterprisePurchaseDateTime;
     private String purchaseDateTimeInEnterpriseTimeZone;
 
 
     public CarDTO(Long carId, Long brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
-                  Long activeDriverId, List<Long> allDriversId, Long enterpriseId, LocalDateTime purchaseDateTime,
+                  Long activeDriverId, List<Long> allDriversId, UUID enterpriseId, LocalDateTime purchaseDateTime,
                   String purchaseDateTimeInEnterpriseTimeZone) {
         this.carId = carId;
         this.brandId = brandId;
@@ -52,7 +53,7 @@ public class CarDTO {
                   String number,
                   Long activeDriverId,
                   List<Long> allDriversId,
-                  Long enterpriseId,
+                  UUID enterpriseId,
                   LocalDateTime purchaseDateTime) {
         this.carId = carId;
         this.brandId = brandId;
@@ -131,11 +132,11 @@ public class CarDTO {
         this.allDriversId = allDriversId;
     }
 
-    public Long getEnterpriseId() {
+    public UUID getEnterpriseId() {
         return enterpriseId;
     }
 
-    public void setEnterpriseId(Long enterpriseId) {
+    public void setEnterpriseId(UUID enterpriseId) {
         this.enterpriseId = enterpriseId;
     }
 

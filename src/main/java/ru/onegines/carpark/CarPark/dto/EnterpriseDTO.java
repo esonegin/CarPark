@@ -6,20 +6,21 @@ import ru.onegines.carpark.CarPark.models.Driver;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author onegines
  * @date 03.11.2024
  */
 public class EnterpriseDTO {
-    private Long enterpriseId;
+    private UUID enterpriseId;
     private String enterpriseName;
     private String enterpriseCity;
     private List<Long> allDriversId;
     private List<Long> allCarsId;
     private String timeZone;
 
-    public EnterpriseDTO(Long enterpriseId, String enterpriseName, String enterpriseCity, List<Long> allDriversId, List<Long> allCarsId, String timeZone) {
+    public EnterpriseDTO(UUID enterpriseId, String enterpriseName, String enterpriseCity, List<Long> allDriversId, List<Long> allCarsId, String timeZone) {
         this.enterpriseId = enterpriseId;
         this.enterpriseName = enterpriseName;
         this.enterpriseCity = enterpriseCity;
@@ -30,14 +31,14 @@ public class EnterpriseDTO {
 
 
 
-    public EnterpriseDTO(Long id, String name, String city, List<Driver> drivers, Set<Car> cars) {
+    public EnterpriseDTO(UUID id, String name, String city, List<Driver> drivers, Set<Car> cars) {
     }
 
-    public Long getEnterpriseId() {
+    public UUID getEnterpriseId() {
         return enterpriseId;
     }
 
-    public void setEnterpriseId(Long enterpriseId) {
+    public void setEnterpriseId(UUID enterpriseId) {
         this.enterpriseId = enterpriseId;
     }
 

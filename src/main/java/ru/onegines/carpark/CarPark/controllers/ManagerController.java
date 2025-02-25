@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -58,7 +59,7 @@ public class ManagerController {
     public String showEnterprises(@PathVariable("id") Long id, HttpSession session, Model model) {
         ManagerDTO manager = managerService.getManagerDTOById(id);
         List<EnterpriseDTO> enterprises = enterpriseService.getEnterprisesByManagerId(id);
-        Map<Long, List<CarDTO>> carsByEnterprise = carService.getCarsDTOGroupedByEnterprise(id);
+        Map<UUID, List<CarDTO>> carsByEnterprise = carService.getCarsDTOGroupedByEnterprise();
 
         // Получение таймзоны клиента из сессии
         String clientTimezone = (String) session.getAttribute("clientTimezone");
@@ -105,7 +106,7 @@ public class ManagerController {
     @GetMapping("/{managerId}/enterprises/{enterpriseId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showEnterpriseCars(@PathVariable Long managerId,
-                                     @PathVariable Long enterpriseId,
+                                     @PathVariable UUID enterpriseId,
                                      Model model) {
         Enterprise enterprise = enterpriseService.findById(enterpriseId);
         List<CarDTO> cars = carService.getCarsByEnterprise(enterpriseId);
@@ -121,7 +122,7 @@ public class ManagerController {
     @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showCarDetails(@PathVariable Long managerId,
-                                 @PathVariable Long enterpriseId,
+                                 @PathVariable UUID enterpriseId,
                                  @PathVariable Long carId,
                                  Model model) {
         CarDTO car = carService.getCarDTO(carId);
@@ -173,7 +174,7 @@ public class ManagerController {
     @Transactional
     @PostMapping("/{managerId}/enterprises/{enterpriseId}/cars")
     public String addCarToEnterprise(
-            @PathVariable("enterpriseId") Long enterpriseId,
+            @PathVariable("enterpriseId") UUID enterpriseId,
             @PathVariable("managerId") Long managerId,
             @ModelAttribute("newCar") CarDTO carDTO,
             Model model) {
@@ -190,7 +191,7 @@ public class ManagerController {
     @DeleteMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}")
     public String deleteCarFromEnterprise(
             @PathVariable Long managerId,
-            @PathVariable Long enterpriseId,
+            @PathVariable UUID enterpriseId,
             @PathVariable Long carId,
             Model model) {
         carService.delete(carId); // Удаление машины из базы
@@ -268,7 +269,7 @@ public class ManagerController {
     @PostMapping("/{managerId}/assignEnterprise/{enterpriseId}")
     public ResponseEntity<String> assignEnterprise(
             @PathVariable Long managerId,
-            @PathVariable Long enterpriseId) {
+            @PathVariable UUID enterpriseId) {
 
         managerService.assignEnterpriseToManager(managerId, enterpriseId);
         return ResponseEntity.ok("Enterprise assigned to Manager successfully.");

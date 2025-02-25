@@ -11,10 +11,7 @@ import ru.onegines.carpark.CarPark.repositories.*;
 import ru.onegines.carpark.CarPark.utils.DateTimeUtil;
 
 import java.time.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -153,7 +150,7 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    public List<Car> findByEnterpriseId(Long id) {
+    public List<Car> findByEnterpriseId(UUID id) {
         return carRepository.findAll()
                 .stream()
                 .filter(car -> car.getEnterprise().getId().equals(id))
@@ -187,7 +184,7 @@ public class CarService {
         }).collect(Collectors.toList());
     }*/
 
-    private ZoneId resolveEnterpriseTimeZone(Long id) {
+    private ZoneId resolveEnterpriseTimeZone(UUID id) {
         Enterprise enterprise = enterpriseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Enterprise not found"));
         return enterprise.getTimeZone() != null
@@ -195,7 +192,7 @@ public class CarService {
                 : ZoneId.of("UTC");
     }
 
-    public List<CarDTO> getCarsByEnterprise(Long id) {
+    public List<CarDTO> getCarsByEnterprise(UUID id) {
         ZoneId enterpriseZoneId = resolveEnterpriseTimeZone(id);
 
         return carRepository.findByEnterpriseId(id)
@@ -222,7 +219,7 @@ public class CarService {
         return enterpriseService.isManagerHasAccess(managerId, car.getEnterprise().getId());
     }
 
-    public void addCarToEnterprise(Long id, CarDTO carDTO) {
+    public void addCarToEnterprise(UUID id, CarDTO carDTO) {
         Car car = new Car();
         Brand brand = brandRepository.findById(carDTO.getBrandId()).orElse(null);
         car.setMileage(carDTO.getMileage());
@@ -234,7 +231,7 @@ public class CarService {
         carRepository.save(car);
     }
 
-    public Map<Long, List<CarDTO>> getCarsDTOGroupedByEnterprise(Long id) {
+    public Map<UUID, List<CarDTO>> getCarsDTOGroupedByEnterprise() {
         return carRepository.findAll().stream()
                 .filter(car -> car.getEnterprise() != null) // Исключаем null
                 .map(car -> new CarDTO(
@@ -254,7 +251,7 @@ public class CarService {
                 .collect(Collectors.groupingBy(CarDTO::getEnterpriseId));
     }
 
-    public List<RouteDTO> getTripsByCar(Long carId, Long id) {
+    public List<RouteDTO> getTripsByCar(Long carId, UUID id) {
         // Получаем таймзону предприятия
         String enterpriseTimeZone = enterpriseRepository.findTimeZoneById(id);
         if (enterpriseTimeZone == null) {

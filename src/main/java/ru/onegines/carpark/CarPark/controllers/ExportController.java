@@ -9,6 +9,7 @@ import ru.onegines.carpark.CarPark.services.ExportService;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -26,7 +27,7 @@ public class ExportController {
 
     @GetMapping("/enterprise/{enterpriseId}")
     public ResponseEntity<?> exportEnterpriseData(
-            @PathVariable Long enterpriseId,
+            @PathVariable UUID enterpriseId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam String format) throws IOException {

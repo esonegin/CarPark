@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
@@ -19,5 +21,9 @@ public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
     //String findTimeZoneById(Long enterpriseId);
 
     @Query("SELECT e.timeZone FROM Enterprise e WHERE e.id = :enterpriseId")
-    String findTimeZoneById(@Param("enterpriseId") Long enterpriseId);
+    String findTimeZoneById(@Param("enterpriseId") UUID enterpriseId);
+
+    Optional<Enterprise> findById(UUID id);
+
+    void deleteById(UUID id);
 }

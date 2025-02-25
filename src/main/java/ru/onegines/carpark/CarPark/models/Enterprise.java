@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -18,7 +19,7 @@ public class Enterprise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "enterprise_id")
-    private Long id;
+    private UUID id;
 
     @ManyToMany(mappedBy = "enterprises")
     private Set<Manager> managers;
@@ -43,11 +44,11 @@ public class Enterprise {
 
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
