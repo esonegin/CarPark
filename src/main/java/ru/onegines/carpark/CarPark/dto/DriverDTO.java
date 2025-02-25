@@ -12,10 +12,10 @@ public class DriverDTO {
     private String driver_name; // ID бренда
     private int driver_salary;
     private UUID enterprise_id;
-    private List<Long> carIds;
+    private List<UUID> carIds;
     //private Long activeCar_id;
 
-    public DriverDTO(Long driver_id, String driver_name, int driver_salary, UUID enterprise_id, List<Long> carIds/*, Long activeCar_id*/) {
+    public DriverDTO(Long driver_id, String driver_name, int driver_salary, UUID enterprise_id, List<UUID> carIds/*, Long activeCar_id*/) {
         this.driver_id = driver_id;
         this.driver_name = driver_name;
         this.driver_salary = driver_salary;
@@ -52,11 +52,11 @@ public class DriverDTO {
 
 
 
-    public List<Long> getCarIds() {
+    public List<UUID> getCarIds() {
         return carIds;
     }
 
-    public void setCarIds(List<Long> carIds) {
+    public void setCarIds(List<UUID> carIds) {
         this.carIds = carIds;
     }
 

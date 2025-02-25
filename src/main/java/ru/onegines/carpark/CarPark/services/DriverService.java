@@ -10,6 +10,7 @@ import ru.onegines.carpark.CarPark.repositories.DriverRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +44,7 @@ public class DriverService {
         return driverRepository.findAll()
                 .stream()
                 .map(driver -> {
-                    List<Long> carIds = driver.getCars().stream()
+                    List<UUID> carIds = driver.getCars().stream()
                             .map(Car::getCarId)
                             .collect(Collectors.toList());
 
@@ -78,7 +79,7 @@ public class DriverService {
         driverRepository.deleteById(id);
     }
 
-    public Set<Driver> findDriversByCarId(Long id) {
+    public Set<Driver> findDriversByCarId(UUID id) {
         //driver_id c нужным car_id
         Set<Long> carDrivers = carDriverService.findAllCarDriversByCarId(id);
 

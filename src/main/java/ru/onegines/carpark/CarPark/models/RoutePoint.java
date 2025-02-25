@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Point;
 
 import java.awt.*;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 
 /**
@@ -20,7 +21,7 @@ public class RoutePoint {
     private Long id;
 
     @Column(name = "car_id")
-    private Long carId;
+    private UUID carId;
 
     @ManyToOne
     @JoinColumn(name = "route_id", nullable = false)
@@ -59,11 +60,11 @@ public class RoutePoint {
         this.id = id;
     }
 
-    public Long getCarId() {
+    public UUID getCarId() {
         return carId;
     }
 
-    public void setCarId(Long carId) {
+    public void setCarId(UUID carId) {
         this.carId = carId;
     }
 

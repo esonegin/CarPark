@@ -6,13 +6,18 @@ import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Repository
-public interface CarRepository extends JpaRepository<Car, Long> {
+public interface CarRepository extends JpaRepository<Car, UUID> {
 
     List<Car> findByEnterpriseIn(Set<Enterprise> enterprises);
 
     List<Car> findByEnterpriseId(UUID enterpriseId);
+
+    Optional<Car> findByCarId(UUID id);
+
+    void deleteByCarId(UUID id);
 }

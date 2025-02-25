@@ -10,7 +10,7 @@ import java.util.UUID;
  * @date 31.10.2024
  */
 public class CarDTO {
-    private Long carId; // ID автомобиля
+    private UUID carId; // ID автомобиля
     private Long brandId; // ID бренда
     private Integer mileage;
     private Integer годВыпуска;
@@ -24,7 +24,7 @@ public class CarDTO {
     private String purchaseDateTimeInEnterpriseTimeZone;
 
 
-    public CarDTO(Long carId, Long brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
+    public CarDTO(UUID carId, Long brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
                   Long activeDriverId, List<Long> allDriversId, UUID enterpriseId, LocalDateTime purchaseDateTime,
                   String purchaseDateTimeInEnterpriseTimeZone) {
         this.carId = carId;
@@ -45,7 +45,7 @@ public class CarDTO {
 
     }
 
-    public CarDTO(Long carId,
+    public CarDTO(UUID carId,
                   Long brandId,
                   int mileage,
                   int годВыпуска,
@@ -68,11 +68,11 @@ public class CarDTO {
 
     }
 
-    public Long getCarId() {
+    public UUID getCarId() {
         return carId;
     }
 
-    public void setCarId(Long carId) {
+    public void setCarId(UUID carId) {
         this.carId = carId;
     }
 

@@ -3,6 +3,7 @@ package ru.onegines.carpark.CarPark.models;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -16,7 +17,7 @@ public class Route {
     private Long id;
 
     @Column(name = "car_id", nullable = false)
-    private Long carId;
+    private UUID carId;
 
     @Column(name = "start_time_utc", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime startTimeUtc;
@@ -32,11 +33,11 @@ public class Route {
         this.id = id;
     }
 
-    public Long getCarId() {
+    public UUID getCarId() {
         return carId;
     }
 
-    public void setCarId(Long carId) {
+    public void setCarId(UUID carId) {
         this.carId = carId;
     }
 

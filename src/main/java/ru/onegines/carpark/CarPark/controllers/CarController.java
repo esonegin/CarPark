@@ -27,10 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -141,7 +138,7 @@ public class CarController {
     //Ilon доступны 9, 8 недоступны 10, 11
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> show(@PathVariable("id") Long id, Model car) {
+    public ResponseEntity<Object> show(@PathVariable("id") UUID id, Model car) {
       /*  car.addAttribute("car", carService.findById(id));
         return "cars/show";*/
         CarDTO carDTO = carService.getCarDTO(id);
@@ -154,7 +151,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
+    public String edit(Model model, @PathVariable("id") UUID id) {
         model.addAttribute("car", carService.findById(id));
         model.addAttribute("brands", brandRepository.findAll());
         model.addAttribute("enterprisse", enterpriseRepository.findAll());
@@ -188,7 +185,7 @@ public class CarController {
     @PatchMapping("/{id}")
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     public ResponseEntity<String> updateCar(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody CarDTO carDTO,
             BindingResult bindingResult) {
 
@@ -225,7 +222,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") long id) {
+    public ResponseEntity<String> delete(@PathVariable("id") UUID id) {
         carService.delete(id);
         if (carService.findById(id) == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Машина удалена. Статус " + HttpStatus.NO_CONTENT.value());
@@ -235,7 +232,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}/assignDrivers")
-    public String showAssignDriversPage(@PathVariable("id") int id, Model model) {
+    public String showAssignDriversPage(@PathVariable("id") UUID id, Model model) {
         Car car = carService.findById(id);
         List<Driver> drivers = driverService.findAll(); // получить всех водителей
         model.addAttribute("car", car);
@@ -245,7 +242,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @PostMapping("/{id}/assignDrivers")
-    public String assignDriverToCar(@PathVariable("id") Long id, @RequestParam int driver_id) {
+    public String assignDriverToCar(@PathVariable("id") UUID id, @RequestParam int driver_id) {
         carService.assignDriver(id, driver_id);
         carService.update(id, carService.findById(id));
         return "redirect:/cars/" + id;
@@ -253,7 +250,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}/assignActiveDriver")
-    public String showAssignActiveDriverForm(@PathVariable Long id, Model model) {
+    public String showAssignActiveDriverForm(@PathVariable UUID id, Model model) {
         Car car = carService.findById(id);
         Set<Driver> assignedDrivers = driverService.findDriversByCarId(id); // Получаем назначенных водителей
         model.addAttribute("car", car);
@@ -263,7 +260,7 @@ public class CarController {
 
     @PreAuthorize("@carService.isManagerHasAccess(authentication.principal.id, #id)")
     @PostMapping("/{id}/assignActiveDriver")
-    public String assignActiveDriver(@PathVariable("id") Long id, @RequestParam Long driverId) throws Exception, DuplicateActiveDriverException {
+    public String assignActiveDriver(@PathVariable("id") UUID id, @RequestParam Long driverId) throws Exception, DuplicateActiveDriverException {
         // Логика назначения активного водителя
         carService.assignActiveDriver(id, driverId);
         carService.update(id, carService.findById(id));

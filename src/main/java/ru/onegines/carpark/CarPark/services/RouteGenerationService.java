@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
 import org.locationtech.jts.geom.*;
 import ru.onegines.carpark.CarPark.repositories.RouteRepository;
@@ -38,7 +39,7 @@ public class RouteGenerationService {
     @Value("${openrouteservice.api.key}")
     private String apiKey;
 
-    private Long carId;
+    private UUID carId;
     private double radius;
     private double trackLength;
     private int pointStep;
@@ -54,7 +55,7 @@ public class RouteGenerationService {
     }
 
     @Transactional
-    public void startRouteGeneration(Long carId, double radius, double trackLength, int pointStep) {
+    public void startRouteGeneration(UUID carId, double radius, double trackLength, int pointStep) {
         this.carId = carId;
         this.radius = radius;
         this.trackLength = trackLength;
@@ -89,7 +90,7 @@ public class RouteGenerationService {
     }
 
     @Transactional
-    public void generateMonthlyRoutes(Long carId, int numRoutes, double maxRadius, double maxTrackLength, int maxStep) {
+    public void generateMonthlyRoutes(UUID carId, int numRoutes, double maxRadius, double maxTrackLength, int maxStep) {
         Random random = new Random();
         // Координаты Москвы (центр города)
         double moscowLat = 55.7558;  // Широта Москвы
