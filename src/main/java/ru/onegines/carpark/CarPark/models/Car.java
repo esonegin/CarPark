@@ -39,7 +39,7 @@ public class Car {
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "enterprise_id", nullable = false) // Внешний ключ
+    @JoinColumn(name = "enterprise_id", nullable = false) // Внешний ключ на UUID
     private Enterprise enterprise;
 
     @ManyToMany

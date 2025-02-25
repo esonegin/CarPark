@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -32,7 +33,7 @@ public class ManagerEnterprise implements Serializable {
         private Long managerId;
 
         @Column(name = "enterprise_id")
-        private Long enterpriseId;
+        private UUID enterpriseId;
 
         // Конструкторы, геттеры и сеттеры
 

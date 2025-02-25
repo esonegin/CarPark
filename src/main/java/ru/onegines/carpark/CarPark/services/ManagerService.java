@@ -1,10 +1,8 @@
 package ru.onegines.carpark.CarPark.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.onegines.carpark.CarPark.dto.CarDTO;
 import ru.onegines.carpark.CarPark.dto.ManagerDTO;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
@@ -16,6 +14,7 @@ import ru.onegines.carpark.CarPark.repositories.ManagerRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -79,7 +78,7 @@ public class ManagerService {
                 .collect(Collectors.toList());
     }
 
-    public void assignEnterpriseToManager(Long manager_id, Long enterpriseId) {
+    public void assignEnterpriseToManager(Long manager_id, UUID enterpriseId) {
         Manager manager = managerRepository.findById(manager_id)
                 .orElseThrow(() -> new RuntimeException("Manager not found"));
         Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
@@ -89,7 +88,7 @@ public class ManagerService {
         managerRepository.save(manager);
     }
 
-    public List<Long> getAllInterprisesId(Long id) {
+    public List<UUID> getAllInterprisesId(Long id) {
         return findById(id).getEnterprises()
                 .stream()
                 .map(Enterprise::getId) // Извлекаем id каждого водителя

@@ -40,7 +40,7 @@ public class EnterpriseService {
         return enterpriseRepository.findAll();
     }
 
-    public Enterprise findById(long id) {
+    public Enterprise findById(UUID id) {
         Optional<Enterprise> enterprise = enterpriseRepository.findById(id);
         return enterprise.orElse(null);
     }
@@ -52,18 +52,18 @@ public class EnterpriseService {
     }
 
     @Transactional
-    public void update(Long id, Enterprise updatedEnterprise) {
+    public void update(UUID id, Enterprise updatedEnterprise) {
         updatedEnterprise.setId(id);
         enterpriseRepository.save(updatedEnterprise);
     }
 
     @Transactional
-    public void delete(long id) {
+    public void delete(UUID id) {
         enterpriseRepository.deleteById(id);
     }
 
     @Transactional
-    public void assignDriver(Long enterprise_id, Long driverId) {
+    public void assignDriver(UUID enterprise_id, Long driverId) {
         Enterprise enterprise = findById(enterprise_id);
         Driver driver = driverService.findById(driverId);
         enterprise.getDrivers().add(driver);
@@ -83,7 +83,7 @@ public class EnterpriseService {
                 .collect(Collectors.toList());
     }
 
-    public EnterpriseDTO getEnterpriseDTO(Long id) {
+    public EnterpriseDTO getEnterpriseDTO(UUID id) {
         for (EnterpriseDTO enterpriseDTO : getAllEnterprises()) {
             if (enterpriseDTO.getEnterpriseId().equals(id)) {
                 return enterpriseDTO;
@@ -92,14 +92,14 @@ public class EnterpriseService {
         return null;
     }
 
-    private List<Long> getAllCarsId(Long enterprise_id) {
+    private List<Long> getAllCarsId(UUID enterprise_id) {
         return findById(enterprise_id).getCars()
                 .stream()
                 .map(Car::getCarId) // Извлекаем id каждого водителя
                 .collect(Collectors.toList());
     }
 
-    public List<Car> getEnterpriseCarsById(Long enterprise_id) {
+    public List<Car> getEnterpriseCarsById(UUID enterprise_id) {
         //List<CarDTO> enterpriseCars= new ArrayList<>();
         List<Long> carIds = getAllCarsId(enterprise_id);
         return carRepository.findAll()
@@ -108,7 +108,7 @@ public class EnterpriseService {
                 .collect(Collectors.toList());
     }
 
-    public List<Long> getAllDriversId(Long enterprise_id) {
+    public List<Long> getAllDriversId(UUID enterprise_id) {
         return findById(enterprise_id).getDrivers()
                 .stream()
                 .map(Driver::getId) // Извлекаем id каждого водителя
@@ -119,7 +119,7 @@ public class EnterpriseService {
         return enterpriseRepository.findByManagers_Id(managerId);
     }
 
-    public boolean isManagerHasAccess(Long managerId, Long enterpriseId) {
+    public boolean isManagerHasAccess(Long managerId, UUID enterpriseId) {
         return enterpriseRepository.findByManagers_Id(managerId)
                 .stream()
                 .anyMatch(enterprise -> enterprise.getId().equals(enterpriseId));
@@ -137,7 +137,7 @@ public class EnterpriseService {
                .collect(Collectors.toList());
     }
 
-    public String getEnterpriseTimeZone(Long enterpriseId) {
+    public String getEnterpriseTimeZone(UUID enterpriseId) {
         return findById(enterpriseId).getTimeZone();
     }
 

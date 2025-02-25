@@ -28,6 +28,7 @@ import ru.onegines.carpark.CarPark.services.ManagerService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -63,7 +64,7 @@ public class EnterpriseController {
     //Bill - доступны 2, 3 Недоступны 1
     @PreAuthorize("@enterpriseService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}")
-    public ResponseEntity<Object> show(@PathVariable("id") long id, Model enterprise, Principal principal) {
+    public ResponseEntity<Object> show(@PathVariable("id") UUID id, Model enterprise, Principal principal) {
         EnterpriseDTO enterpriseDTO = enterpriseService.getEnterpriseDTO(id);
         if (enterpriseDTO == null) {
             return ResponseEntity.notFound().build();
@@ -89,7 +90,7 @@ public class EnterpriseController {
 
     @PreAuthorize("@enterpriseService.isManagerHasAccess(authentication.principal.id, #id)")
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
+    public String edit(Model model, @PathVariable("id") UUID id) {
         model.addAttribute("enterprise", enterpriseService.findById(id));
         return "enterprises/edit";
     }
@@ -97,7 +98,7 @@ public class EnterpriseController {
     @PreAuthorize("@enterpriseService.isManagerHasAccess(authentication.principal.id, #id)")
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("enterprise") Enterprise enterprise, BindingResult bindingResult,
-                         @PathVariable("id") Long id) {
+                         @PathVariable("id") UUID id) {
         if (bindingResult.hasErrors()) {
             return "enterprises/edit";
         }
@@ -108,7 +109,7 @@ public class EnterpriseController {
     @PreAuthorize("@enterpriseService.isManagerHasAccess(authentication.principal.id, #id)")
     @Transactional
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") UUID id) {
         // Обновляем машины, чтобы `enterprise_id` стал `null`
         List<Car> cars = carService.findByEnterpriseId(id);
         for (Car car : cars) {
@@ -121,7 +122,7 @@ public class EnterpriseController {
     }
 
     @GetMapping("/{id}/assignCars")
-    public String showAssignCarsToEnterpriseForm(@PathVariable Long id, Model model) {
+    public String showAssignCarsToEnterpriseForm(@PathVariable UUID id, Model model) {
         Enterprise enterprise = enterpriseService.findById(id);
         List<Car> availableCars = carService.getAvailableCars(); // Автомобили без привязки к предприятию
         model.addAttribute("enterprise", enterprise);
@@ -130,7 +131,7 @@ public class EnterpriseController {
     }
 
     @GetMapping("/{id}/assignDrivers")
-    public String showAssignCDriversToEnterpriseForm(@PathVariable Long id, Model model) {
+    public String showAssignCDriversToEnterpriseForm(@PathVariable UUID id, Model model) {
         Enterprise enterprise = enterpriseService.findById(id);
         List<Driver> drivers = driverService.findAll(); // Автомобили без привязки к предприятию
         model.addAttribute("enterprise", enterprise);
@@ -139,7 +140,7 @@ public class EnterpriseController {
     }
 
     @PostMapping("/{id}/assignDrivers")
-    public String assignDriversToEnterprise(@PathVariable Long id, @RequestParam Long driver_id) {
+    public String assignDriversToEnterprise(@PathVariable UUID id, @RequestParam Long driver_id) {
         enterpriseService.assignDriver(id, driver_id);
         return "redirect:/enterprises/" + id;
     }

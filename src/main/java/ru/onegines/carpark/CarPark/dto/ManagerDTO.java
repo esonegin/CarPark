@@ -1,6 +1,7 @@
 package ru.onegines.carpark.CarPark.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -19,11 +20,11 @@ public class ManagerDTO {
         this.managerName = managerName;
         this.managerSalary = managerSalary;
         this.allEnterpiseId = allEnterpiseId;
-        this.allDriversId = allDriversId;
-        this.allCarsId = allCarsId;
+        this.allDriversId = this.allDriversId;
+        this.allCarsId = this.allCarsId;
     }
 
-    public ManagerDTO(Long id, String username, List<Long> allInterprisesId, List<Long> allDriversId, List<Long> allCarsId) {
+    public ManagerDTO(Long id, String username, List<UUID> allInterprisesId, List<Long> allDriversId, List<Long> allCarsId) {
     }
 
     public Long getId() {
