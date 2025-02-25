@@ -1,5 +1,7 @@
 package ru.onegines.carpark.CarPark.dto;
 
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -19,12 +21,16 @@ public class RouteDTO {
     private ZonedDateTime endTimeUtc;
 
     // Полный конструктор
+
     public RouteDTO(Long id, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
         this.id = id;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
         this.startTimeUtc = startTimeUtc;
         this.endTimeUtc = endTimeUtc;
+    }
+
+    public RouteDTO(Long id, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
     }
 
     // Сеттеры и геттеры

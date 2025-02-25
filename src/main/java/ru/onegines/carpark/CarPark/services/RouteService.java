@@ -163,7 +163,7 @@ public class RouteService {
     }
 
 
-    private String findFirstValidAddressByRouteId(Long routeId) {
+    public String findFirstValidAddressByRouteId(Long routeId) {
         // Находим первую точку маршрута с валидным адресом
         Optional<RoutePoint> firstValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(
                 routeId,
@@ -174,7 +174,7 @@ public class RouteService {
         return firstValidPoint.map(RoutePoint::getAddress).orElse("Адрес не определен");
     }
 
-    private String findLastValidAddressByRouteId(Long routeId) {
+    String findLastValidAddressByRouteId(Long routeId) {
         // Находим последнюю точку маршрута с валидным адресом
         Optional<RoutePoint> lastValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(
                 routeId,

@@ -2,9 +2,37 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Автомобили предприятия</title>
+  <script>
+    function exportData(format) {
+      let enterpriseId = document.getElementById("enterpriseId").value;
+      let startDate = document.getElementById("startDate").value;
+      let endDate = document.getElementById("endDate").value;
+
+      if (!enterpriseId || !startDate || !endDate) {
+        alert("Пожалуйста, выберите предприятие и укажите диапазон дат.");
+        return;
+      }
+
+      let url = `/export/enterprise/${enterpriseId}?startDate=${startDate}&endDate=${endDate}&format=${format}`;
+      window.location.href = url;
+    }
+  </script>
 </head>
 <body>
 <h1>Автомобили предприятия</h1>
+
+<label for="enterpriseId">ID предприятия:</label>
+<input type="text" id="enterpriseId" th:value="${enterpriseId}" readonly />
+
+<label for="startDate">Начальная дата:</label>
+<input type="date" id="startDate" required />
+
+<label for="endDate">Конечная дата:</label>
+<input type="date" id="endDate" required />
+
+<button onclick="exportData('csv')">Экспорт в CSV</button>
+<button onclick="exportData('json')">Экспорт в JSON</button>
+
 <ul>
   <li th:each="car : ${cars}">
     <a th:href="@{/managers/{managerId}/enterprises/{enterpriseId}/cars/{carId}(managerId=${managerId}, enterpriseId=${enterpriseId}, carId=${car.carId})}"
