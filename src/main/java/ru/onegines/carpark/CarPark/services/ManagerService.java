@@ -104,7 +104,7 @@ public class ManagerService {
 
     }
 
-    public List<Long> getAllCarsId(Long id) {
+    public List<UUID> getAllCarsId(Long id) {
         return enterpriseRepository.findByManagers_Id(id)
                 .stream()
                 .flatMap(enterprise -> enterprise.getCars().stream()) // объединяет всех водителей от всех предприятий

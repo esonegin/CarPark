@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.onegines.carpark.CarPark.dto.RouteDTO;
@@ -22,7 +21,6 @@ import ru.onegines.carpark.CarPark.repositories.RoutePointRepository;
 import ru.onegines.carpark.CarPark.repositories.RouteRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,8 +55,8 @@ public class RouteService {
 
 
     //Конвертация дат фильтра в тайм-зону предприятия
-    public HashMap<String, ZonedDateTime> getZoneStartAnEndTime(Long carId, String start, String end) {
-        Car car = carRepository.findById(carId)
+    public HashMap<String, ZonedDateTime> getZoneStartAnEndTime(UUID carId, String start, String end) {
+        Car car = carRepository.findByCarId(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Автомобиль с ID " + carId + " не найден"));
 
         Enterprise enterprise = enterpriseRepository.findById(car.getEnterprise().getId())
@@ -79,7 +77,7 @@ public class RouteService {
     }
 
     //Получение координат маршрутов
-    public List<double[]> getPointsForDataFilter(Long carId, String start, String end) {
+    public List<double[]> getPointsForDataFilter(UUID carId, String start, String end) {
         // Фильтрация маршрутов
         HashMap<String, ZonedDateTime> formattedDates = getZoneStartAnEndTime(carId, start, end);
         List<Route> routes = routeRepository.findAllByCarIdAndStartTimeUtcGreaterThanEqualAndEndTimeUtcLessThanEqual(
@@ -109,7 +107,7 @@ public class RouteService {
     }
 
     //Запрос к OpenRouteService
-    public Map<String, Object> requestFromOpenRouteService(Long carId, String start, String end) {
+    public Map<String, Object> requestFromOpenRouteService(UUID carId, String start, String end) {
         // Получаем список координат для фильтрации
         List<double[]> coordinates = getPointsForDataFilter(carId, start, end);
         String orsResponse = openRouteService.fetchRoute(apiKey, coordinates);
@@ -129,7 +127,7 @@ public class RouteService {
     }
 
 
-    public List<RouteDTO> getTrips(Long carId, String start, String end) {
+    public List<RouteDTO> getTrips(UUID carId, String start, String end) {
         // Получаем отформатированные даты
         HashMap<String, ZonedDateTime> formattedDates = getZoneStartAnEndTime(carId, start, end);
 
@@ -217,7 +215,7 @@ public class RouteService {
         return null;
     }
 
-    public Map<String, Object> requestFromOpenRouteService(Long carId, ZonedDateTime start, ZonedDateTime end) {
+    public Map<String, Object> requestFromOpenRouteService(UUID carId, ZonedDateTime start, ZonedDateTime end) {
         try {
             // Находим первую и последнюю точки маршрута
             Optional<RoutePoint> startPointOptional = routePointRepository.findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(carId, start, end);

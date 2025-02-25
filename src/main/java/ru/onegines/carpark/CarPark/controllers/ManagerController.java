@@ -123,7 +123,7 @@ public class ManagerController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showCarDetails(@PathVariable Long managerId,
                                  @PathVariable UUID enterpriseId,
-                                 @PathVariable Long carId,
+                                 @PathVariable UUID carId,
                                  Model model) {
         CarDTO car = carService.getCarDTO(carId);
         List<RouteDTO> trips = carService.getTripsByCar(carId, enterpriseId);  // Передаем enterpriseId
@@ -141,7 +141,7 @@ public class ManagerController {
     public String showEditCarForm(
             @PathVariable Long managerId,
             @PathVariable Long enterpriseId,
-            @PathVariable Long carId,
+            @PathVariable UUID carId,
             Model model) {
         // Получение информации о машине для редактирования
         CarDTO car = carService.getCarDTO(carId);
@@ -159,8 +159,8 @@ public class ManagerController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String updateCar(
             @PathVariable Long managerId,
-            @PathVariable Long enterpriseId,
-            @PathVariable Long carId,
+            @PathVariable UUID enterpriseId,
+            @PathVariable UUID carId,
             @ModelAttribute("car") CarDTO carDTO) {
         // Обновление информации о машине
         carService.update(carId, carDTO);
@@ -192,7 +192,7 @@ public class ManagerController {
     public String deleteCarFromEnterprise(
             @PathVariable Long managerId,
             @PathVariable UUID enterpriseId,
-            @PathVariable Long carId,
+            @PathVariable UUID carId,
             Model model) {
         carService.delete(carId); // Удаление машины из базы
         // Обновление данных в модели

@@ -2,10 +2,12 @@ package ru.onegines.carpark.CarPark.models;
 
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -15,9 +17,9 @@ import java.util.Set;
 @Table(name = "cars")
 public class Car {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "car_id")
-    private Long carId;
+    @GeneratedValue(generator = "UUID")
+    @Column(name = "car_id", columnDefinition = "UUID", updatable = false, nullable = false)
+    private UUID carId;
 
     @Column(name = "mileage")
     private Integer mileage;
@@ -67,11 +69,11 @@ public class Car {
         this.brand = brand;
     }
 
-    public Long getCarId() {
+    public UUID getCarId() {
         return carId;
     }
 
-    public void setCarId(Long carId) {
+    public void setCarId(UUID carId) {
         this.carId = carId;
     }
 

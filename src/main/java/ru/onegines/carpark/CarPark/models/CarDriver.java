@@ -2,6 +2,8 @@ package ru.onegines.carpark.CarPark.models;
 
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 /**
  * @author onegines
  * @date 02.11.2024
@@ -11,16 +13,16 @@ import jakarta.persistence.*;
 public class CarDriver {
     @Id
     @Column(name = "car_id")
-    private int car_id;
+    private UUID car_id;
 
     @Column(name = "driver_id")
     private Long driver_id;
 
-    public int getCar_id() {
+    public UUID getCar_id() {
         return car_id;
     }
 
-    public void setCar_id(int car_id) {
+    public void setCar_id(UUID car_id) {
         this.car_id = car_id;
     }
 

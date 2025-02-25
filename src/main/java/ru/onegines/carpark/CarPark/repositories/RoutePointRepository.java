@@ -7,11 +7,12 @@ import ru.onegines.carpark.CarPark.models.RoutePoint;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
     // Вы можете добавить методы для кастомных запросов, если необходимо
-    List<RoutePoint> findAllByCarIdOrderByTimestampUtc(Long carId);
+    List<RoutePoint> findAllByCarIdOrderByTimestampUtc(UUID carId);
 
     List<RoutePoint> findAllByRouteIdOrderByTimestampUtc(Long routeId);
 
@@ -27,7 +28,7 @@ public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
 
     Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdDesc(Long routeId, List<String> excludedAddresses);
 
-    Optional<RoutePoint> findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(Long carId, ZonedDateTime start, ZonedDateTime end);
+    Optional<RoutePoint> findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(UUID carId, ZonedDateTime start, ZonedDateTime end);
 
-    Optional<RoutePoint> findLastByCarIdAndTimestampUtcBetweenOrderByTimestampUtcDesc(Long carId, ZonedDateTime start, ZonedDateTime end);
+    Optional<RoutePoint> findLastByCarIdAndTimestampUtcBetweenOrderByTimestampUtcDesc(UUID carId, ZonedDateTime start, ZonedDateTime end);
 }

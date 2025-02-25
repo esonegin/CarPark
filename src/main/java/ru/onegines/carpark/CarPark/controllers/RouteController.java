@@ -15,6 +15,7 @@ import ru.onegines.carpark.CarPark.services.RouteService;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -42,7 +43,7 @@ public class RouteController {
 
     @PostMapping("/mass-generate")
     public ResponseEntity<?> generateRoutes(
-            @RequestParam Long carId,
+            @RequestParam UUID carId,
             @RequestParam int numRoutes,
             @RequestParam double maxRadius,
             @RequestParam double maxTrackLength,
@@ -59,7 +60,7 @@ public class RouteController {
 
     @PostMapping("/start")
     public ResponseEntity<?> startRoute(
-            @RequestParam Long carId,
+            @RequestParam UUID carId,
             @RequestParam double radius,
             @RequestParam double trackLength,
             @RequestParam int pointStep
@@ -107,7 +108,7 @@ public class RouteController {
 
     @GetMapping("/filter")
     public ResponseEntity<?> filterRoutesAndFetchDetails(
-            @RequestParam("carId") Long carId, // Указываем имя параметра
+            @RequestParam("carId") UUID carId, // Указываем имя параметра
             @RequestParam("start") String start, // Указываем имя параметра
             @RequestParam("end") String end // Указываем имя параметра
     ) {
@@ -136,7 +137,7 @@ public class RouteController {
 
     @GetMapping("/api")
     public ResponseEntity<?> getTrips(
-            @RequestParam Long carId,
+            @RequestParam UUID carId,
             @RequestParam String start,
             @RequestParam String end
     ) {

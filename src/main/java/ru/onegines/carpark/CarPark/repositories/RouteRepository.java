@@ -1,20 +1,18 @@
 package ru.onegines.carpark.CarPark.repositories;
 
-import io.micrometer.common.KeyValues;
-import org.springframework.beans.PropertyValues;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.onegines.carpark.CarPark.models.Route;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 
 @Repository
 public interface RouteRepository extends JpaRepository<Route, Long> {
     List<Route> findAllByCarIdAndStartTimeUtcGreaterThanEqualAndEndTimeUtcLessThanEqual(
-            Long carId,
+            UUID carId,
             ZonedDateTime startTime,
             ZonedDateTime endTime
     );
@@ -23,7 +21,7 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
 
     //List<Route> findByCarIdAndEnterpriseId(Long carId, Long enterpriseId);
 
-    List<Route> findByCarIdAndStartTimeUtcBetween(Long carId, ZonedDateTime start, ZonedDateTime end);
+    List<Route> findByCarIdAndStartTimeUtcBetween(UUID carId, ZonedDateTime start, ZonedDateTime end);
 
-    List<Route> findByCarId(Long carId);
+    List<Route> findByCarId(UUID carId);
 }

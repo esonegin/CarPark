@@ -24,8 +24,9 @@ public class ManagerDTO {
         this.allCarsId = this.allCarsId;
     }
 
-    public ManagerDTO(Long id, String username, List<UUID> allInterprisesId, List<Long> allDriversId, List<Long> allCarsId) {
+    public ManagerDTO(Long id, String username, List<UUID> allInterprisesId, List<Long> allDriversId, List<UUID> allCarsId) {
     }
+
 
     public Long getId() {
         return id;

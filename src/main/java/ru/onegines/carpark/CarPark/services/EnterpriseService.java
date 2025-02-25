@@ -92,7 +92,7 @@ public class EnterpriseService {
         return null;
     }
 
-    private List<Long> getAllCarsId(UUID enterprise_id) {
+    private List<UUID> getAllCarsId(UUID enterprise_id) {
         return findById(enterprise_id).getCars()
                 .stream()
                 .map(Car::getCarId) // Извлекаем id каждого водителя
@@ -101,7 +101,7 @@ public class EnterpriseService {
 
     public List<Car> getEnterpriseCarsById(UUID enterprise_id) {
         //List<CarDTO> enterpriseCars= new ArrayList<>();
-        List<Long> carIds = getAllCarsId(enterprise_id);
+        List<UUID> carIds = getAllCarsId(enterprise_id);
         return carRepository.findAll()
                 .stream()
                 .filter(car -> carIds.contains(car.getCarId()))

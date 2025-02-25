@@ -67,7 +67,7 @@ public class CarService {
     }
 
 
-    public CarDTO getCarDTO(Long id) {
+    public CarDTO getCarDTO(UUID id) {
         for (CarDTO carDTO : getAllCars()) {
             if (carDTO.getCarId().equals(id)) {
                 return carDTO;
@@ -82,13 +82,13 @@ public class CarService {
     }
 
     @Transactional
-    public void update(Long id, Car updatedCar) {
+    public void update(UUID id, Car updatedCar) {
         updatedCar.setCarId(id);
         carRepository.save(updatedCar);
     }
 
     @Transactional
-    public void update(Long carId, CarDTO carDTO) {
+    public void update(UUID carId, CarDTO carDTO) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found with id " + carId));
 
@@ -103,14 +103,14 @@ public class CarService {
         carRepository.save(car); // Сохранение изменений
     }
 
-    public Car findById(long id) {
-        Optional<Car> car = carRepository.findById(id);
+    public Car findById(UUID id) {
+        Optional<Car> car = carRepository.findByCarId(id);
         return car.orElse(null);
     }
 
     @Transactional
-    public void delete(long id) {
-        carRepository.deleteById(id);
+    public void delete(UUID id) {
+        carRepository.deleteByCarId(id);
     }
 
     public List<Car> getAvailableCars() {
@@ -120,15 +120,15 @@ public class CarService {
     }
 
     @Transactional
-    public void assignDriver(Long carId, int driverId) {
+    public void assignDriver(UUID carId, int driverId) {
         Car car = findById(carId);
         Driver driver = driverService.findById(driverId);
         car.getDrivers().add(driver);
         carRepository.save(car);
     }
 
-    public void assignActiveDriver(Long carId, Long driverId) {
-        Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+    public void assignActiveDriver(UUID carId, Long driverId) {
+        Car car = carRepository.findByCarId(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
 
         // Деактивируем предыдущего активного водителя
         if (car.getActiveDriver() != null) {
@@ -143,7 +143,7 @@ public class CarService {
         driverRepository.save(driver); // Сохраняем изменения в
     }
 
-    public List<Long> getAllDriversId(Long car_id) {
+    public List<Long> getAllDriversId(UUID car_id) {
         return findById(car_id).getDrivers()
                 .stream()
                 .map(Driver::getId) // Извлекаем id каждого водителя
@@ -214,7 +214,7 @@ public class CarService {
     }
 
 
-    public boolean isManagerHasAccess(Long managerId, Long carId) {
+    public boolean isManagerHasAccess(Long managerId, UUID carId) {
         Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         return enterpriseService.isManagerHasAccess(managerId, car.getEnterprise().getId());
     }
@@ -251,7 +251,7 @@ public class CarService {
                 .collect(Collectors.groupingBy(CarDTO::getEnterpriseId));
     }
 
-    public List<RouteDTO> getTripsByCar(Long carId, UUID id) {
+    public List<RouteDTO> getTripsByCar(UUID carId, UUID id) {
         // Получаем таймзону предприятия
         String enterpriseTimeZone = enterpriseRepository.findTimeZoneById(id);
         if (enterpriseTimeZone == null) {
@@ -287,9 +287,9 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    private List<RouteDTO> getTripsByCar(Long carId, Long enterpriseId, LocalDate startDate, LocalDate endDate) {
+    private List<RouteDTO> getTripsByCar(UUID carId, Long enterpriseId, LocalDate startDate, LocalDate endDate) {
         // Проверяем, принадлежит ли машина данному enterpriseId
-        Optional<Car> carOptional = carRepository.findById(carId);
+        Optional<Car> carOptional = carRepository.findByCarId(carId);
         if (carOptional.isEmpty() || !carOptional.get().getEnterprise().getId().equals(enterpriseId)) {
             return Collections.emptyList();
         }

@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.onegines.carpark.CarPark.repositories.CarDriversRepository;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +21,7 @@ public class CarDriverService {
         this.carDriversRepository = carDriversRepository;
     }
 
-    public Set<Long> findAllCarDriversByCarId(Long id) {
+    public Set<Long> findAllCarDriversByCarId(UUID id) {
         return carDriversRepository.findAll()
                 .stream()
                 .filter(carDriver -> carDriver.getCar_id() == id)

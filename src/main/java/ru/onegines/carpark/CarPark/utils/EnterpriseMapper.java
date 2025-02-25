@@ -6,6 +6,7 @@ import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +19,7 @@ public class EnterpriseMapper {
                 .map(Driver::getId) // Предполагается, что у Driver есть метод getId()
                 .collect(Collectors.toList());
 
-        List<Long> allCarsId = enterprise.getCars().stream()
+        List<UUID> allCarsId = enterprise.getCars().stream()
                 .map(Car::getCarId) // Предполагается, что у Car есть метод getId()
                 .collect(Collectors.toList());
 

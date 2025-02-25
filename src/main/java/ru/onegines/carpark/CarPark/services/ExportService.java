@@ -148,9 +148,9 @@ public class ExportService {
 
 
 
-    private List<RouteDTO> getTripsByCar(Long carId, UUID enterpriseId, LocalDate startDate, LocalDate endDate) {
+    private List<RouteDTO> getTripsByCar(UUID carId, UUID enterpriseId, LocalDate startDate, LocalDate endDate) {
         // Проверяем, принадлежит ли машина данному enterpriseId
-        Optional<Car> carOptional = carRepository.findById(carId);
+        Optional<Car> carOptional = carRepository.findByCarId(carId);
         if (carOptional.isEmpty() || !carOptional.get().getEnterprise().getId().equals(enterpriseId)) {
             return Collections.emptyList();
         }
