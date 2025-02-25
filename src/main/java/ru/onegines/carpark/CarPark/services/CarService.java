@@ -10,10 +10,7 @@ import ru.onegines.carpark.CarPark.models.*;
 import ru.onegines.carpark.CarPark.repositories.*;
 import ru.onegines.carpark.CarPark.utils.DateTimeUtil;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -190,18 +187,18 @@ public class CarService {
         }).collect(Collectors.toList());
     }*/
 
-    private ZoneId resolveEnterpriseTimeZone(Long enterpriseId) {
-        Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
+    private ZoneId resolveEnterpriseTimeZone(Long id) {
+        Enterprise enterprise = enterpriseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Enterprise not found"));
         return enterprise.getTimeZone() != null
                 ? ZoneId.of(enterprise.getTimeZone())
                 : ZoneId.of("UTC");
     }
 
-    public List<CarDTO> getCarsByEnterprise(Long enterpriseId) {
-        ZoneId enterpriseZoneId = resolveEnterpriseTimeZone(enterpriseId);
+    public List<CarDTO> getCarsByEnterprise(Long id) {
+        ZoneId enterpriseZoneId = resolveEnterpriseTimeZone(id);
 
-        return carRepository.findByEnterpriseId(enterpriseId)
+        return carRepository.findByEnterpriseId(id)
                 .stream()
                 .map(car -> toCarDTO(car, enterpriseZoneId))
                 .collect(Collectors.toList());
@@ -225,7 +222,7 @@ public class CarService {
         return enterpriseService.isManagerHasAccess(managerId, car.getEnterprise().getId());
     }
 
-    public void addCarToEnterprise(Long enterpriseId, CarDTO carDTO) {
+    public void addCarToEnterprise(Long id, CarDTO carDTO) {
         Car car = new Car();
         Brand brand = brandRepository.findById(carDTO.getBrandId()).orElse(null);
         car.setMileage(carDTO.getMileage());
@@ -233,7 +230,7 @@ public class CarService {
         car.setReserve(carDTO.getReserve());
         car.setNumber(carDTO.getNumber());
         car.setBrand(brand);
-        car.setEnterprise(enterpriseService.findById(enterpriseId));
+        car.setEnterprise(enterpriseService.findById(id));
         carRepository.save(car);
     }
 
@@ -257,11 +254,11 @@ public class CarService {
                 .collect(Collectors.groupingBy(CarDTO::getEnterpriseId));
     }
 
-    public List<RouteDTO> getTripsByCar(Long carId, Long enterpriseId) {
+    public List<RouteDTO> getTripsByCar(Long carId, Long id) {
         // Получаем таймзону предприятия
-        String enterpriseTimeZone = enterpriseRepository.findTimeZoneById(enterpriseId);
+        String enterpriseTimeZone = enterpriseRepository.findTimeZoneById(id);
         if (enterpriseTimeZone == null) {
-            throw new IllegalArgumentException("Таймзона предприятия не найдена для ID: " + enterpriseId);
+            throw new IllegalArgumentException("Таймзона предприятия не найдена для ID: " + id);
         }
 
         // Получаем поездки для машины
@@ -291,6 +288,35 @@ public class CarService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<RouteDTO> getTripsByCar(Long carId, Long enterpriseId, LocalDate startDate, LocalDate endDate) {
+        // Проверяем, принадлежит ли машина данному enterpriseId
+        Optional<Car> carOptional = carRepository.findById(carId);
+        if (carOptional.isEmpty() || !carOptional.get().getEnterprise().getId().equals(enterpriseId)) {
+            return Collections.emptyList();
+        }
+
+        List<Route> routes;
+        if (startDate != null && endDate != null) {
+            routes = routeRepository.findByCarIdAndStartTimeUtcBetween(
+                    carId,
+                    startDate.atStartOfDay(ZoneOffset.UTC),
+                    endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC) // Включаем весь день endDate
+            );
+        } else {
+            routes = routeRepository.findByCarId(carId);
+        }
+
+        return routes.stream()
+                .map(route -> new RouteDTO(
+                        route.getId(),
+                        getStartAddress(route.getId()), // Получаем начальный адрес
+                        getEndAddress(route.getId()),  // Получаем конечный адрес
+                        route.getStartTimeUtc(),
+                        route.getEndTimeUtc()
+                ))
+                .toList();
     }
 
     public String getStartAddress(Long routeId) {
