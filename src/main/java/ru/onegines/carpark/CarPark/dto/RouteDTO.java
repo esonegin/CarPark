@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -14,7 +15,7 @@ import java.time.ZonedDateTime;
 
 
 public class RouteDTO {
-    private Long id;
+    private UUID id;
     private String startAddress;
     private String endAddress;
     private ZonedDateTime startTimeUtc;
@@ -22,7 +23,7 @@ public class RouteDTO {
 
     // Полный конструктор
 
-    public RouteDTO(Long id, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
+    public RouteDTO(UUID id, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
         this.id = id;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
@@ -30,11 +31,11 @@ public class RouteDTO {
         this.endTimeUtc = endTimeUtc;
     }
 
-    public RouteDTO(Long id, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
+    public RouteDTO(UUID id, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
     }
 
     // Сеттеры и геттеры
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -54,7 +55,7 @@ public class RouteDTO {
         return endTimeUtc;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

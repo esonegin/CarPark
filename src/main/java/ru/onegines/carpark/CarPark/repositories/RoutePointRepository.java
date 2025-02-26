@@ -14,19 +14,19 @@ public interface RoutePointRepository extends JpaRepository<RoutePoint, Long> {
     // Вы можете добавить методы для кастомных запросов, если необходимо
     List<RoutePoint> findAllByCarIdOrderByTimestampUtc(UUID carId);
 
-    List<RoutePoint> findAllByRouteIdOrderByTimestampUtc(Long routeId);
+    List<RoutePoint> findAllByRouteIdOrderByTimestampUtc(UUID routeId);
 
-    List<RoutePoint> findAllByRouteIdInOrderByTimestampUtc(List<Long> routeIds);
+    List<RoutePoint> findAllByRouteIdInOrderByTimestampUtc(List<UUID> routeIds);
 
     // Находит первую точку маршрута с валидным адресом, отсортированную по времени в порядке возрастания
-    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(Long routeId, List<String> invalidAddresses);
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(UUID routeId, List<String> invalidAddresses);
 
     // Находит последнюю точку маршрута с валидным адресом, отсортированную по времени в порядке убывания
-    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(Long routeId, List<String> invalidAddresses);
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(UUID routeId, List<String> invalidAddresses);
 
-    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdAsc(Long routeId, List<String> excludedAddresses);
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdAsc(UUID routeId, List<String> excludedAddresses);
 
-    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdDesc(Long routeId, List<String> excludedAddresses);
+    Optional<RoutePoint> findFirstByRouteIdAndAddressNotInOrderByIdDesc(UUID routeId, List<String> excludedAddresses);
 
     Optional<RoutePoint> findFirstByCarIdAndTimestampUtcBetweenOrderByTimestampUtcAsc(UUID carId, ZonedDateTime start, ZonedDateTime end);
 

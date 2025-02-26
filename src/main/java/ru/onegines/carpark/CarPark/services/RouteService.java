@@ -87,7 +87,7 @@ public class RouteService {
         System.out.println("Диапазон дат: " + formattedDates.get("start") + " - " + formattedDates.get("end"));
         System.out.println("Найденные маршруты: " + routes);
         // Выводим только id маршрутов
-        List<Long> routeIds = routes.stream()
+        List<UUID> routeIds = routes.stream()
                 .map(Route::getId)  // Преобразуем каждый Route в его id
                 .collect(Collectors.toList());  // Собираем в список
         System.out.println("Найденные маршруты (ID): " + routeIds);
@@ -96,7 +96,7 @@ public class RouteService {
             throw new IllegalArgumentException("Нет маршрутов в заданном диапазоне.");
         }
 
-        List<Long> routesId = routes.stream()
+        List<UUID> routesId = routes.stream()
                 .map(Route::getId)
                 .collect(Collectors.toList());
         List<RoutePoint> routePoints = routePointRepository.findAllByRouteIdInOrderByTimestampUtc(routesId);
@@ -161,7 +161,7 @@ public class RouteService {
     }
 
 
-    public String findFirstValidAddressByRouteId(Long routeId) {
+    public String findFirstValidAddressByRouteId(UUID routeId) {
         // Находим первую точку маршрута с валидным адресом
         Optional<RoutePoint> firstValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcAsc(
                 routeId,
@@ -172,7 +172,7 @@ public class RouteService {
         return firstValidPoint.map(RoutePoint::getAddress).orElse("Адрес не определен");
     }
 
-    String findLastValidAddressByRouteId(Long routeId) {
+    String findLastValidAddressByRouteId(UUID routeId) {
         // Находим последнюю точку маршрута с валидным адресом
         Optional<RoutePoint> lastValidPoint = routePointRepository.findFirstByRouteIdAndAddressNotInOrderByTimestampUtcDesc(
                 routeId,

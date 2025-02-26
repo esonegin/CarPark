@@ -18,7 +18,7 @@ import java.util.UUID;
 public class RoutePoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "car_id")
     private UUID carId;
@@ -52,11 +52,11 @@ public class RoutePoint {
         this.point = point;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
