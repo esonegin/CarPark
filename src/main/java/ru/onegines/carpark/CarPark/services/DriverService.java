@@ -69,7 +69,7 @@ public class DriverService {
     }
 
     @Transactional
-    public void update(Long id, Driver updatedDriver) {
+    public void update(UUID id, Driver updatedDriver) {
         updatedDriver.setId(id);
         driverRepository.save(updatedDriver);
     }
@@ -81,7 +81,7 @@ public class DriverService {
 
     public Set<Driver> findDriversByCarId(UUID id) {
         //driver_id c нужным car_id
-        Set<Long> carDrivers = carDriverService.findAllCarDriversByCarId(id);
+        Set<UUID> carDrivers = carDriverService.findAllCarDriversByCarId(id);
 
         //Стрим всех водителей и таблицы drivers
         Set<Driver> drivers = driverRepository.findAll().stream()

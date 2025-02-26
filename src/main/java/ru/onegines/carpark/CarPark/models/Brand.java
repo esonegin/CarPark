@@ -3,6 +3,7 @@ package ru.onegines.carpark.CarPark.models;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -15,7 +16,7 @@ public class Brand {
     @Id
     @Column(name = "brand_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Car> cars;
@@ -32,11 +33,11 @@ public class Brand {
     @Column(name = "seats")
     private int seats;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long brand_id) {
+    public void setId(UUID brand_id) {
         this.id = id;
     }
 

@@ -11,6 +11,7 @@ import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.services.BrandService;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -41,7 +42,7 @@ public class BrandController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model brand) {
+    public String show(@PathVariable("id") UUID id, Model brand) {
         brand.addAttribute("brand", brandService.findById(id));
         return "brands/show";
     }
@@ -59,14 +60,14 @@ public class BrandController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
+    public String edit(Model model, @PathVariable("id") UUID id) {
         model.addAttribute("brand", brandService.findById(id));
         return "brands/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("brand") Brand brand, BindingResult bindingResult,
-                         @PathVariable("id") Long id) {
+                         @PathVariable("id") UUID id) {
         if (bindingResult.hasErrors()) {
             return "brands/edit";
         }
@@ -75,7 +76,7 @@ public class BrandController {
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") UUID id) {
         brandService.delete(id);
         return "redirect:/brands";
     }

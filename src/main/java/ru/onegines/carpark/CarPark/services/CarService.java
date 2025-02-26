@@ -143,7 +143,7 @@ public class CarService {
         driverRepository.save(driver); // Сохраняем изменения в
     }
 
-    public List<Long> getAllDriversId(UUID car_id) {
+    public List<UUID> getAllDriversId(UUID car_id) {
         return findById(car_id).getDrivers()
                 .stream()
                 .map(Driver::getId) // Извлекаем id каждого водителя
@@ -214,7 +214,7 @@ public class CarService {
     }
 
 
-    public boolean isManagerHasAccess(Long managerId, UUID carId) {
+    public boolean isManagerHasAccess(UUID managerId, UUID carId) {
         Car car = carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException("Car not found"));
         return enterpriseService.isManagerHasAccess(managerId, car.getEnterprise().getId());
     }

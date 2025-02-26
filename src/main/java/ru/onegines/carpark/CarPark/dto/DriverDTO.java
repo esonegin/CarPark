@@ -8,14 +8,14 @@ import java.util.UUID;
  * @date 03.11.2024
  */
 public class DriverDTO {
-    private Long driver_id; // ID автомобиля
+    private UUID driver_id; // ID автомобиля
     private String driver_name; // ID бренда
     private int driver_salary;
     private UUID enterprise_id;
     private List<UUID> carIds;
     //private Long activeCar_id;
 
-    public DriverDTO(Long driver_id, String driver_name, int driver_salary, UUID enterprise_id, List<UUID> carIds/*, Long activeCar_id*/) {
+    public DriverDTO(UUID driver_id, String driver_name, int driver_salary, UUID enterprise_id, List<UUID> carIds/*, Long activeCar_id*/) {
         this.driver_id = driver_id;
         this.driver_name = driver_name;
         this.driver_salary = driver_salary;
@@ -26,11 +26,11 @@ public class DriverDTO {
 
 
 
-    public Long getDriver_id() {
+    public UUID getDriver_id() {
         return driver_id;
     }
 
-    public void setDriver_id(Long driver_id) {
+    public void setDriver_id(UUID driver_id) {
         this.driver_id = driver_id;
     }
 
@@ -67,12 +67,4 @@ public class DriverDTO {
     public void setEnterprise_id(UUID enterprise_id) {
         this.enterprise_id = enterprise_id;
     }
-
-    /*public Long getActiveCar_id() {
-        return activeCar_id;
-    }
-
-    public void setActiveCar_id(Long activeCar_id) {
-        this.activeCar_id = activeCar_id;
-    }*/
 }

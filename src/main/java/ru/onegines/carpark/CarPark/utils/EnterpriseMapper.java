@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class EnterpriseMapper {
     public static EnterpriseDTO toDTO(Enterprise enterprise) {
-        List<Long> allDriversId = enterprise.getDrivers().stream()
+        List<UUID> allDriversId = enterprise.getDrivers().stream()
                 .map(Driver::getId) // Предполагается, что у Driver есть метод getId()
                 .collect(Collectors.toList());
 

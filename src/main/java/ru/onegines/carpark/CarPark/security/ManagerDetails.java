@@ -8,6 +8,7 @@ import ru.onegines.carpark.CarPark.models.Manager;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 
 /**
@@ -38,7 +39,7 @@ public class ManagerDetails implements UserDetails {
     }
 
 
-    public Long getId() {
+    public UUID getId() {
         return this.manager.getId();
     }
 

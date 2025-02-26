@@ -56,7 +56,7 @@ public class ManagerController {
     private EnterpriseService enterpriseService;
 
     @GetMapping("/{id}/enterprises")
-    public String showEnterprises(@PathVariable("id") Long id, HttpSession session, Model model) {
+    public String showEnterprises(@PathVariable("id") UUID id, HttpSession session, Model model) {
         ManagerDTO manager = managerService.getManagerDTOById(id);
         List<EnterpriseDTO> enterprises = enterpriseService.getEnterprisesByManagerId(id);
         Map<UUID, List<CarDTO>> carsByEnterprise = carService.getCarsDTOGroupedByEnterprise();
@@ -105,7 +105,7 @@ public class ManagerController {
 
     @GetMapping("/{managerId}/enterprises/{enterpriseId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public String showEnterpriseCars(@PathVariable Long managerId,
+    public String showEnterpriseCars(@PathVariable UUID managerId,
                                      @PathVariable UUID enterpriseId,
                                      Model model) {
         Enterprise enterprise = enterpriseService.findById(enterpriseId);
@@ -121,7 +121,7 @@ public class ManagerController {
 
     @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public String showCarDetails(@PathVariable Long managerId,
+    public String showCarDetails(@PathVariable UUID managerId,
                                  @PathVariable UUID enterpriseId,
                                  @PathVariable UUID carId,
                                  Model model) {
@@ -139,8 +139,8 @@ public class ManagerController {
     @GetMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}/edit")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showEditCarForm(
-            @PathVariable Long managerId,
-            @PathVariable Long enterpriseId,
+            @PathVariable UUID managerId,
+            @PathVariable UUID enterpriseId,
             @PathVariable UUID carId,
             Model model) {
         // Получение информации о машине для редактирования
@@ -158,7 +158,7 @@ public class ManagerController {
     @PostMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}/update")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String updateCar(
-            @PathVariable Long managerId,
+            @PathVariable UUID managerId,
             @PathVariable UUID enterpriseId,
             @PathVariable UUID carId,
             @ModelAttribute("car") CarDTO carDTO) {
@@ -175,7 +175,7 @@ public class ManagerController {
     @PostMapping("/{managerId}/enterprises/{enterpriseId}/cars")
     public String addCarToEnterprise(
             @PathVariable("enterpriseId") UUID enterpriseId,
-            @PathVariable("managerId") Long managerId,
+            @PathVariable("managerId") UUID managerId,
             @ModelAttribute("newCar") CarDTO carDTO,
             Model model) {
         carDTO.setEnterpriseId(enterpriseId);
@@ -190,7 +190,7 @@ public class ManagerController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @DeleteMapping("/{managerId}/enterprises/{enterpriseId}/cars/{carId}")
     public String deleteCarFromEnterprise(
-            @PathVariable Long managerId,
+            @PathVariable UUID managerId,
             @PathVariable UUID enterpriseId,
             @PathVariable UUID carId,
             Model model) {
@@ -236,14 +236,14 @@ public class ManagerController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
+    public String edit(Model model, @PathVariable("id") UUID id) {
         model.addAttribute("manager", managerService.findById(id));
         return "managers/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("manager") Manager manager, BindingResult bindingResult,
-                         @PathVariable("id") Long id) {
+                         @PathVariable("id") UUID id) {
         if (bindingResult.hasErrors()) {
             return "managers/edit";
         }
@@ -258,7 +258,7 @@ public class ManagerController {
     }
 
     @GetMapping("/{id}/assignEnterprise")
-    public String showAssignEnterpriseToManagerForm(@PathVariable Long id, Model model) {
+    public String showAssignEnterpriseToManagerForm(@PathVariable UUID id, Model model) {
         Manager manager = managerService.findById(id);
         List<Enterprise> availableEnterprises = managerService.getAvailableEnterprises();
         model.addAttribute("manager", manager);
@@ -268,7 +268,7 @@ public class ManagerController {
 
     @PostMapping("/{managerId}/assignEnterprise/{enterpriseId}")
     public ResponseEntity<String> assignEnterprise(
-            @PathVariable Long managerId,
+            @PathVariable UUID managerId,
             @PathVariable UUID enterpriseId) {
 
         managerService.assignEnterpriseToManager(managerId, enterpriseId);

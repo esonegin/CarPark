@@ -13,19 +13,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import ru.onegines.carpark.CarPark.services.ManagerDetailsService;
 import ru.onegines.carpark.CarPark.services.ManagerService;
 
+import java.util.Optional;
+import java.util.UUID;
 
-/**
- * @author onegines
- * @date 08.11.2024
- */
 @Configuration
 @EnableWebSecurity
-
 public class SecurityConfig {
 
     private final ManagerDetailsService managerDetailsService;
     private final ManagerService managerService;
-
 
     @Autowired
     public SecurityConfig(ManagerDetailsService managerDetailsService, ManagerService managerService) {
@@ -37,8 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/process_login").permitAll() // Разрешаем доступ к логину
-                        .anyRequest().authenticated() // Остальные запросы только для авторизованных
+                        .requestMatchers("/auth/login", "/process_login").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/auth/login")
@@ -46,11 +42,17 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/enterprises", true)
                         .successHandler((request, response, authentication) -> {
                             String managerName = authentication.getName();
-                            Long managerId = managerService.findByUsername(managerName).get().getId();
-                            response.sendRedirect("/managers/" + managerId + "/enterprises");
+                            Optional<UUID> managerId = managerService.findByUsername(managerName)
+                                    .map(manager -> manager.getId());
+
+                            if (managerId.isPresent()) {
+                                response.sendRedirect("/managers/" + managerId.get() + "/enterprises");
+                            } else {
+                                response.sendRedirect("/auth/login?error=manager_not_found");
+                            }
                         })
                         .failureHandler((request, response, exception) -> {
-                            response.sendRedirect("/auth/login?error"); // Редирект на логин при ошибке
+                            response.sendRedirect("/auth/login?error");
                         })
                 )
                 .logout(logout -> logout
@@ -61,7 +63,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/auth/login"); // Перенаправляем на логин, если неавторизован
+                            response.sendRedirect("/auth/login");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

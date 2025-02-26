@@ -16,11 +16,11 @@ public class EnterpriseDTO {
     private UUID enterpriseId;
     private String enterpriseName;
     private String enterpriseCity;
-    private List<Long> allDriversId;
+    private List<UUID> allDriversId;
     private List<UUID> allCarsId;
     private String timeZone;
 
-    public EnterpriseDTO(UUID enterpriseId, String enterpriseName, String enterpriseCity, List<Long> allDriversId, List<UUID> allCarsId, String timeZone) {
+    public EnterpriseDTO(UUID enterpriseId, String enterpriseName, String enterpriseCity, List<UUID> allDriversId, List<UUID> allCarsId, String timeZone) {
         this.enterpriseId = enterpriseId;
         this.enterpriseName = enterpriseName;
         this.enterpriseCity = enterpriseCity;
@@ -58,11 +58,11 @@ public class EnterpriseDTO {
         this.enterpriseCity = enterpriseCity;
     }
 
-    public List<Long> getAllDriversId() {
+    public List<UUID> getAllDriversId() {
         return allDriversId;
     }
 
-    public void setAllDriversId(List<Long> allDriversId) {
+    public void setAllDriversId(List<UUID> allDriversId) {
         this.allDriversId = allDriversId;
     }
 

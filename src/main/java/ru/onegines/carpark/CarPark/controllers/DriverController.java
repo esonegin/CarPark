@@ -17,6 +17,7 @@ import ru.onegines.carpark.CarPark.services.DriverService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -43,7 +44,7 @@ public class DriverController {
 
     @GetMapping("/{id}")
     public String getDriverCars(@PathVariable Long id, Model model, Principal principal) {
-        Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
+        UUID managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
         Optional<Driver> driverOptional = driverService.getDriverWithCars(id);
         //if (driverService.isManagerHasAccess(managerId, id)) {
             if (driverOptional.isPresent()) {
@@ -78,7 +79,7 @@ public class DriverController {
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("driver") Driver driver, BindingResult bindingResult,
-                         @PathVariable("id") Long id) {
+                         @PathVariable("id") UUID id) {
         if (bindingResult.hasErrors()) {
             return "drivers/edit";
         }

@@ -21,7 +21,7 @@ public class CarDriverService {
         this.carDriversRepository = carDriversRepository;
     }
 
-    public Set<Long> findAllCarDriversByCarId(UUID id) {
+    public Set<UUID> findAllCarDriversByCarId(UUID id) {
         return carDriversRepository.findAll()
                 .stream()
                 .filter(carDriver -> carDriver.getCar_id() == id)

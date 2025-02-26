@@ -36,7 +36,7 @@ public class ManagerService {
         this.enterpriseRepository = enterpriseRepository;
     }
 
-    public Manager findById(long id) {
+    public Manager findById(UUID id) {
         Optional<Manager> manager = managerRepository.findById(id);
         return manager.orElse(null);
     }
@@ -47,7 +47,7 @@ public class ManagerService {
     }
 
     @Transactional
-    public void update(Long id, Manager updatedManager) {
+    public void update(UUID id, Manager updatedManager) {
         updatedManager.setId(id);
         managerRepository.save(updatedManager);
     }
@@ -78,7 +78,7 @@ public class ManagerService {
                 .collect(Collectors.toList());
     }
 
-    public void assignEnterpriseToManager(Long manager_id, UUID enterpriseId) {
+    public void assignEnterpriseToManager(UUID manager_id, UUID enterpriseId) {
         Manager manager = managerRepository.findById(manager_id)
                 .orElseThrow(() -> new RuntimeException("Manager not found"));
         Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
@@ -88,14 +88,14 @@ public class ManagerService {
         managerRepository.save(manager);
     }
 
-    public List<UUID> getAllInterprisesId(Long id) {
+    public List<UUID> getAllInterprisesId(UUID id) {
         return findById(id).getEnterprises()
                 .stream()
                 .map(Enterprise::getId) // Извлекаем id каждого водителя
                 .collect(Collectors.toList());
     }
 
-    public List<Long> getAllDriversId(Long id) {
+    public List<UUID> getAllDriversId(UUID id) {
         return enterpriseRepository.findByManagers_Id(id)
                 .stream()
                 .flatMap(enterprise -> enterprise.getDrivers().stream()) // объединяет всех водителей от всех предприятий
@@ -104,7 +104,7 @@ public class ManagerService {
 
     }
 
-    public List<UUID> getAllCarsId(Long id) {
+    public List<UUID> getAllCarsId(UUID id) {
         return enterpriseRepository.findByManagers_Id(id)
                 .stream()
                 .flatMap(enterprise -> enterprise.getCars().stream()) // объединяет всех водителей от всех предприятий
@@ -122,14 +122,15 @@ public class ManagerService {
 
     // public ManagerDTO(Long id, String managerName, Integer managerSalary, List<Long> allEnterpiseId, List<Long> allDriversId, List<Long> allCarsId) {
 
-    public ManagerDTO getManagerDTOById(Long id) {
+    public ManagerDTO getManagerDTOById(UUID id) {
         return managerRepository.findAll()
                 .stream()
-                .filter(manager -> manager.getId() == id)
+                .filter(manager -> manager.getId().equals(id)) // Используем equals() вместо ==
                 .map(manager -> new ManagerDTO(
                         manager.getId(),
                         manager.getUsername()))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Manager not found with ID: " + id));
     }
+
 }

@@ -30,7 +30,7 @@ public class ManagerEnterprise implements Serializable {
     public static class ManagerEnterpriseId implements Serializable {
 
         @Column(name = "manager_id")
-        private Long managerId;
+        private UUID managerId;
 
         @Column(name = "enterprise_id")
         private UUID enterpriseId;
