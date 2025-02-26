@@ -14,7 +14,7 @@ import java.util.UUID;
 public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "car_id", nullable = false)
     private UUID carId;
@@ -25,11 +25,11 @@ public class Route {
     @Column(name = "end_time_utc", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private ZonedDateTime endTimeUtc;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

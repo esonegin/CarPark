@@ -316,13 +316,13 @@ public class CarService {
                 .toList();
     }
 
-    public String getStartAddress(Long routeId) {
+    public String getStartAddress(UUID routeId) {
         return routePointRepository.findFirstByRouteIdAndAddressNotInOrderByIdAsc(
                 routeId, List.of("-", "Адрес не найден")
         ).map(RoutePoint::getAddress).orElse("Неизвестно");
     }
 
-    public String getEndAddress(Long routeId) {
+    public String getEndAddress(UUID routeId) {
         return routePointRepository.findFirstByRouteIdAndAddressNotInOrderByIdDesc(
                 routeId, List.of("-", "Адрес не найден")
         ).map(RoutePoint::getAddress).orElse("Неизвестно");
