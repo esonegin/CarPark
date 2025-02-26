@@ -8,14 +8,14 @@ import java.util.UUID;
  * @date 05.11.2024
  */
 public class ManagerDTO {
-    private Long id;
+    private UUID id;
     private String managerName;
     private Integer managerSalary;
-    private List<Long> allEnterpiseId;
-    private List<Long> allDriversId;
-    private List<Long> allCarsId;
+    private List<UUID> allEnterpiseId;
+    private List<UUID> allDriversId;
+    private List<UUID> allCarsId;
 
-    public ManagerDTO(Long id, String managerName) {
+    public ManagerDTO(UUID id, String managerName) {
         this.id = id;
         this.managerName = managerName;
         this.managerSalary = managerSalary;
@@ -24,15 +24,15 @@ public class ManagerDTO {
         this.allCarsId = this.allCarsId;
     }
 
-    public ManagerDTO(Long id, String username, List<UUID> allInterprisesId, List<Long> allDriversId, List<UUID> allCarsId) {
+    public ManagerDTO(UUID id, String username, List<UUID> allInterprisesId, List<UUID> allDriversId, List<UUID> allCarsId) {
     }
 
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -52,27 +52,27 @@ public class ManagerDTO {
         this.managerSalary = managerSalary;
     }
 
-    public List<Long> getAllEnterpiseId() {
+    public List<UUID> getAllEnterpiseId() {
         return allEnterpiseId;
     }
 
-    public void setAllEnterpiseId(List<Long> allEnterpiseId) {
+    public void setAllEnterpiseId(List<UUID> allEnterpiseId) {
         this.allEnterpiseId = allEnterpiseId;
     }
 
-    public List<Long> getAllDriversId() {
+    public List<UUID> getAllDriversId() {
         return allDriversId;
     }
 
-    public void setAllDriversId(List<Long> allDriversId) {
+    public void setAllDriversId(List<UUID> allDriversId) {
         this.allDriversId = allDriversId;
     }
 
-    public List<Long> getAllCarsId() {
+    public List<UUID> getAllCarsId() {
         return allCarsId;
     }
 
-    public void setAllCarsId(List<Long> allCarsId) {
+    public void setAllCarsId(List<UUID> allCarsId) {
         this.allCarsId = allCarsId;
     }
 

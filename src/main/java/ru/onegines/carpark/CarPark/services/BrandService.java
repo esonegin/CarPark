@@ -9,6 +9,7 @@ import ru.onegines.carpark.CarPark.repositories.BrandRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -29,7 +30,7 @@ public class BrandService {
         return brandRepository.findAll();
     }
 
-    public Brand findById(long id) {
+    public Brand findById(UUID id) {
         Optional<Brand> brand = brandRepository.findById(id);
         return brand.orElse(null);
     }
@@ -40,13 +41,13 @@ public class BrandService {
     }
 
     @Transactional
-    public void update(Long id, Brand updatedBrand){
+    public void update(UUID id, Brand updatedBrand){
         updatedBrand.setId(id);
         brandRepository.save(updatedBrand);
     }
 
     @Transactional
-    public void delete(long id){
+    public void delete(UUID id){
         brandRepository.deleteById(id);
     }
 }

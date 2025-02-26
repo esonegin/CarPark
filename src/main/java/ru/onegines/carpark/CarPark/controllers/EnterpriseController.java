@@ -83,7 +83,7 @@ public class EnterpriseController {
     @PostMapping("/save")
     public String saveEnterprise(@ModelAttribute Enterprise enterprise, Principal principal) {
         enterpriseService.save(enterprise);
-        Long managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
+        UUID managerId = ((ManagerDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getManager().getId();
         managerService.assignEnterpriseToManager(managerId, enterprise.getId());
         return "redirect:/enterprises";
     }

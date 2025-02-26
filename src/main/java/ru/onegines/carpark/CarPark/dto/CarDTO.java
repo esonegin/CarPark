@@ -11,21 +11,21 @@ import java.util.UUID;
  */
 public class CarDTO {
     private UUID carId; // ID автомобиля
-    private Long brandId; // ID бренда
+    private UUID brandId; // ID бренда
     private Integer mileage;
     private Integer годВыпуска;
     private Integer reserve;
     private String number;
-    private Long activeDriverId;
-    private List<Long> allDriversId;
+    private UUID activeDriverId;
+    private List<UUID> allDriversId;
     private UUID enterpriseId;
     private LocalDateTime purchaseDateTime;
     private LocalDateTime enterprisePurchaseDateTime;
     private String purchaseDateTimeInEnterpriseTimeZone;
 
 
-    public CarDTO(UUID carId, Long brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
-                  Long activeDriverId, List<Long> allDriversId, UUID enterpriseId, LocalDateTime purchaseDateTime,
+    public CarDTO(UUID carId, UUID brandId, Integer mileage, Integer годВыпуска, Integer reserve, String number,
+                  UUID activeDriverId, List<UUID> allDriversId, UUID enterpriseId, LocalDateTime purchaseDateTime,
                   String purchaseDateTimeInEnterpriseTimeZone) {
         this.carId = carId;
         this.brandId = brandId;
@@ -46,13 +46,13 @@ public class CarDTO {
     }
 
     public CarDTO(UUID carId,
-                  Long brandId,
+                  UUID brandId,
                   int mileage,
                   int годВыпуска,
                   int reserve,
                   String number,
-                  Long activeDriverId,
-                  List<Long> allDriversId,
+                  UUID activeDriverId,
+                  List<UUID> allDriversId,
                   UUID enterpriseId,
                   LocalDateTime purchaseDateTime) {
         this.carId = carId;
@@ -76,11 +76,11 @@ public class CarDTO {
         this.carId = carId;
     }
 
-    public Long getBrandId() {
+    public UUID getBrandId() {
         return brandId;
     }
 
-    public void setBrandId(Long brandId) {
+    public void setBrandId(UUID brandId) {
         this.brandId = brandId;
     }
 
@@ -116,19 +116,19 @@ public class CarDTO {
         this.number = number;
     }
 
-    public Long getActiveDriverId() {
+    public UUID getActiveDriverId() {
         return activeDriverId;
     }
 
-    public void setActiveDriverId(Long activeDriverId) {
+    public void setActiveDriverId(UUID activeDriverId) {
         this.activeDriverId = activeDriverId;
     }
 
-    public List<Long> getAllDriversId() {
+    public List<UUID> getAllDriversId() {
         return allDriversId;
     }
 
-    public void setAllDriversId(List<Long> allDriversId) {
+    public void setAllDriversId(List<UUID> allDriversId) {
         this.allDriversId = allDriversId;
     }
 

@@ -108,24 +108,24 @@ public class EnterpriseService {
                 .collect(Collectors.toList());
     }
 
-    public List<Long> getAllDriversId(UUID enterprise_id) {
+    public List<UUID> getAllDriversId(UUID enterprise_id) {
         return findById(enterprise_id).getDrivers()
                 .stream()
                 .map(Driver::getId) // Извлекаем id каждого водителя
                 .collect(Collectors.toList());
     }
 
-    public Set<Enterprise> getEnterprisesForManager(Long managerId) {
+    public Set<Enterprise> getEnterprisesForManager(UUID managerId) {
         return enterpriseRepository.findByManagers_Id(managerId);
     }
 
-    public boolean isManagerHasAccess(Long managerId, UUID enterpriseId) {
+    public boolean isManagerHasAccess(UUID managerId, UUID enterpriseId) {
         return enterpriseRepository.findByManagers_Id(managerId)
                 .stream()
                 .anyMatch(enterprise -> enterprise.getId().equals(enterpriseId));
     }
 
-    public List<EnterpriseDTO> getEnterprisesByManagerId(Long id) {
+    public List<EnterpriseDTO> getEnterprisesByManagerId(UUID id) {
        return getEnterprisesForManager(id)
                .stream()
                .map(enterprise -> new EnterpriseDTO(enterprise.getId(),

@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author onegines
@@ -17,7 +18,7 @@ public class Manager extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "manager_id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "name")
     private String name;
@@ -41,7 +42,7 @@ public class Manager extends User {
     }
 
 
-    public Manager(String username, String password, Set<GrantedAuthority> authorities, Long id, String role, Set<Enterprise> enterprises) {
+    public Manager(String username, String password, Set<GrantedAuthority> authorities, UUID id, String role, Set<Enterprise> enterprises) {
         super(username, password, authorities);
         this.id = id;
         this.role = role;
@@ -67,11 +68,11 @@ public class Manager extends User {
         this.name = name;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
