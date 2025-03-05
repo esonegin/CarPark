@@ -16,6 +16,27 @@
       let url = `/export/enterprise/${enterpriseId}?startDate=${startDate}&endDate=${endDate}&format=${format}`;
       window.location.href = url;
     }
+
+    function importData() {
+      let fileInput = document.getElementById("importFile");
+      let file = fileInput.files[0];
+
+      if (!file) {
+        alert("Выберите файл для импорта.");
+        return;
+      }
+
+      let formData = new FormData();
+      formData.append("file", file);
+
+      fetch("/import/enterprise", {
+        method: "POST",
+        body: formData
+      })
+              .then(response => response.text())
+              .then(data => alert(data))
+              .catch(error => console.error("Ошибка импорта:", error));
+    }
   </script>
 </head>
 <body>
@@ -32,6 +53,10 @@
 
 <button onclick="exportData('csv')">Экспорт в CSV</button>
 <button onclick="exportData('json')">Экспорт в JSON</button>
+
+<h2>Импорт данных</h2>
+<input type="file" id="importFile" />
+<button onclick="importData()">Импортировать</button>
 
 <ul>
   <li th:each="car : ${cars}">

@@ -278,42 +278,13 @@ public class CarService {
 
                     return new RouteDTO(
                             trip.getId(),
-                            getStartAddress(trip.getId()),  // Получаем начальный адрес
+                            carId, getStartAddress(trip.getId()),  // Получаем начальный адрес
                             getEndAddress(trip.getId()),    // Получаем конечный адрес
                             startTimeInEnterpriseZone,      // Используем время в таймзоне предприятия
                             roundedEndTimeUtc               // Используем округленное время окончания
                     );
                 })
                 .collect(Collectors.toList());
-    }
-
-    private List<RouteDTO> getTripsByCar(UUID carId, Long enterpriseId, LocalDate startDate, LocalDate endDate) {
-        // Проверяем, принадлежит ли машина данному enterpriseId
-        Optional<Car> carOptional = carRepository.findByCarId(carId);
-        if (carOptional.isEmpty() || !carOptional.get().getEnterprise().getId().equals(enterpriseId)) {
-            return Collections.emptyList();
-        }
-
-        List<Route> routes;
-        if (startDate != null && endDate != null) {
-            routes = routeRepository.findByCarIdAndStartTimeUtcBetween(
-                    carId,
-                    startDate.atStartOfDay(ZoneOffset.UTC),
-                    endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC) // Включаем весь день endDate
-            );
-        } else {
-            routes = routeRepository.findByCarId(carId);
-        }
-
-        return routes.stream()
-                .map(route -> new RouteDTO(
-                        route.getId(),
-                        getStartAddress(route.getId()), // Получаем начальный адрес
-                        getEndAddress(route.getId()),  // Получаем конечный адрес
-                        route.getStartTimeUtc(),
-                        route.getEndTimeUtc()
-                ))
-                .toList();
     }
 
     public String getStartAddress(UUID routeId) {
@@ -336,5 +307,4 @@ public class CarService {
         // Если секунды и наносекунды уже равны 0, возвращаем исходное значение
         return dateTime;
     }
-
 }

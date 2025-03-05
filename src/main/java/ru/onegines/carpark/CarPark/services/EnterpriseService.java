@@ -141,6 +141,9 @@ public class EnterpriseService {
         return findById(enterpriseId).getTimeZone();
     }
 
+    public void saveEnterprise(EnterpriseDTO enterprise) {
+    }
+
 
     /*public List<Enterprise> generateEnterprises(int enterpriseCount, int carCountPerEnterprise) {
         List<Enterprise> enterprises = new ArrayList<>();

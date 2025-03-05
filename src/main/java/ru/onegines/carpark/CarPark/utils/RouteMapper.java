@@ -11,7 +11,7 @@ public interface RouteMapper {
     RouteMapper INSTANCE = Mappers.getMapper(RouteMapper.class);
 
     default RouteDTO toDto(Route route) {
-        return new RouteDTO(route.getId(), route.getStartTimeUtc(), route.getEndTimeUtc());
+        return new RouteDTO(route.getId(), route.getStartTimeUtc(), route.getEndTimeUtc(), route.getCarId());
     }
 
     List<RouteDTO> toDto(List<Route> routes);
