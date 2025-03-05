@@ -169,7 +169,7 @@ public class ExportService {
         return routes.stream()
                 .map(route -> new RouteDTO(
                         route.getId(),
-                        carService.getStartAddress(route.getId()), // Получаем начальный адрес
+                        carId, carService.getStartAddress(route.getId()), // Получаем начальный адрес
                         carService.getEndAddress(route.getId()),  // Получаем конечный адрес
                         route.getStartTimeUtc(),
                         route.getEndTimeUtc()

@@ -6,6 +6,7 @@ import ru.onegines.carpark.CarPark.models.Route;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.UUID;
 
 
@@ -24,4 +25,6 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     List<Route> findByCarIdAndStartTimeUtcBetween(UUID carId, ZonedDateTime start, ZonedDateTime end);
 
     List<Route> findByCarId(UUID carId);
+
+    OptionalDouble findById(UUID id);
 }

@@ -1,9 +1,5 @@
 package ru.onegines.carpark.CarPark.dto;
 
-import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -16,6 +12,7 @@ import java.util.UUID;
 
 public class RouteDTO {
     private UUID id;
+    private UUID carId;
     private String startAddress;
     private String endAddress;
     private ZonedDateTime startTimeUtc;
@@ -23,15 +20,17 @@ public class RouteDTO {
 
     // Полный конструктор
 
-    public RouteDTO(UUID id, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
+    public RouteDTO(UUID id, UUID carId, String startAddress, String endAddress, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
         this.id = id;
+        this.carId = carId;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
         this.startTimeUtc = startTimeUtc;
         this.endTimeUtc = endTimeUtc;
     }
 
-    public RouteDTO(UUID id, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc) {
+    public RouteDTO(UUID id, ZonedDateTime startTimeUtc, ZonedDateTime endTimeUtc, UUID carId) {
+        this.carId = carId;
     }
 
     // Сеттеры и геттеры
@@ -73,6 +72,14 @@ public class RouteDTO {
 
     public void setEndTimeUtc(ZonedDateTime endTimeUtc) {
         this.endTimeUtc = endTimeUtc;
+    }
+
+    public UUID getCarId() {
+        return carId;
+    }
+
+    public void setCarId(UUID carId) {
+        this.carId = carId;
     }
 }
 

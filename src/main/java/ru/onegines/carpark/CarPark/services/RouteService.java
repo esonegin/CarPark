@@ -147,7 +147,7 @@ public class RouteService {
                         // Создаем RouteDTO
                         return new RouteDTO(
                                 route.getId(),
-                                startAddress,  // Получаем начальный адрес
+                                carId, startAddress,  // Получаем начальный адрес
                                 endAddress,    // Получаем конечный адрес
                                 route.getStartTimeUtc(),
                                 route.getEndTimeUtc());
@@ -249,5 +249,16 @@ public class RouteService {
             e.printStackTrace();
             throw new RuntimeException("Ошибка при запросе к OpenRouteService: " + e.getMessage(), e);
         }
+    }
+
+    public void saveRoute(RouteDTO routeDTO) {
+        Route route = new Route();
+        route.setId(routeDTO.getId());
+        route.setCarId(routeDTO.getCarId());
+        route.setStartTimeUtc(routeDTO.getStartTimeUtc());
+        route.setEndTimeUtc(routeDTO.getEndTimeUtc());
+
+
+        routeRepository.save(route);
     }
 }

@@ -1,6 +1,12 @@
 package ru.onegines.carpark.CarPark.dto;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.UUIDDeserializer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.onegines.carpark.CarPark.models.Car;
 import ru.onegines.carpark.CarPark.models.Driver;
 
@@ -12,7 +18,10 @@ import java.util.UUID;
  * @author onegines
  * @date 03.11.2024
  */
+@Getter
+@Setter
 public class EnterpriseDTO {
+    @JsonDeserialize(using = UUIDDeserializer.class)
     private UUID enterpriseId;
     private String enterpriseName;
     private String enterpriseCity;
@@ -29,6 +38,8 @@ public class EnterpriseDTO {
         this.timeZone = timeZone;
     }
 
+    public EnterpriseDTO() {
+    }
 
 
     public EnterpriseDTO(UUID id, String name, String city, List<Driver> drivers, Set<Car> cars) {
