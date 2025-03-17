@@ -68,6 +68,11 @@ public class CarDTO {
 
     }
 
+    public CarDTO(UUID carId, String number) {
+        this.carId = carId;
+        this.number = number;
+    }
+
     public UUID getCarId() {
         return carId;
     }

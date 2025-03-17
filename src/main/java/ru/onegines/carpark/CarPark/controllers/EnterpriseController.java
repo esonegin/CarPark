@@ -29,6 +29,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author onegines
@@ -152,5 +153,14 @@ public class EnterpriseController {
 
         // Возвращаем только те предприятия, к которым у менеджера есть доступ
         return currentManager.getEnterprises();
+    }
+
+    @GetMapping("/{enterpriseId}/cars")
+    public ResponseEntity<List<CarDTO>> getEnterpriseCars(@PathVariable UUID enterpriseId) {
+        List<Car> cars = enterpriseService.getEnterpriseCarsById(enterpriseId);
+        List<CarDTO> carDTOs = cars.stream()
+                .map(car -> new CarDTO(car.getCarId(), car.getNumber()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(carDTOs);
     }
 }

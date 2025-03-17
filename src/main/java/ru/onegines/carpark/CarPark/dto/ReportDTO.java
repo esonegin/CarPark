@@ -15,13 +15,15 @@ public class ReportDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Map<LocalDate, Double> result;
+    private double totalMileage;
 
-    public ReportDTO(String name, String period, LocalDateTime startDate, LocalDateTime endDate, Map<LocalDate, Double> result) {
+    public ReportDTO(String name, String period, LocalDateTime startDate, LocalDateTime endDate, Map<LocalDate, Double> result, double totalMileage) {
         this.name = name;
         this.period = period;
         this.startDate = startDate;
         this.endDate = endDate;
         this.result = result;
+        this.totalMileage = totalMileage;
     }
 
     public String getName() {
@@ -62,6 +64,14 @@ public class ReportDTO {
 
     public void setResult(Map<LocalDate, Double> result) {
         this.result = result;
+    }
+
+    public double getTotalMileage() {
+        return totalMileage;
+    }
+
+    public void setTotalMileage(double totalMileage) {
+        this.totalMileage = totalMileage;
     }
 }
 

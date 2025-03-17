@@ -7,8 +7,11 @@ import ru.onegines.carpark.CarPark.models.Enterprise;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     Set<Driver> findByEnterpriseIn(Set<Enterprise> enterprises);
+
+    List<Driver> findByEnterpriseId(UUID enterpriseId);
 }
