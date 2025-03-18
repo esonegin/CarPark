@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Отчёты</title>
+  <script>
+    async function loadCarsForMileage() {
+      const enterpriseId = document.getElementById("mileageEnterprise").value;
+      const carSelect = document.getElementById("mileageCar");
+
+      if (!enterpriseId) {
+        carSelect.innerHTML = "<option>Выберите предприятие</option>";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/enterprises/${enterpriseId}/cars`);
+        if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+
+        const cars = await response.json();
+        carSelect.innerHTML = cars.length
+                ? cars.map(car => `<option value="${car.carId}">${car.number}</option>`).join("")
+                : "<option>Нет доступных машин</option>";
+
+      } catch (error) {
+        carSelect.innerHTML = `<option>Ошибка загрузки</option>`;
+        console.error("Ошибка при загрузке автомобилей:", error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("reportForm");
+      const reportType = document.getElementById("reportType");
+
+      // Переключение типа отчёта
+      reportType.addEventListener("change", function () {
+        const type = this.value;
+        document.getElementById("mileageReport").style.display = type === "mileage" ? "block" : "none";
+        document.getElementById("salaryReport").style.display = type === "salary" ? "block" : "none";
+        form.action = type === "salary" ? "/api/reports/salary" : "/api/reports/mileage";
+      });
+
+      // Фильтрация и отправка формы
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Удаляем скрытые поля перед отправкой
+        document.querySelectorAll("select, input").forEach(el => {
+          if (el.closest("div[style='display:none;']")) el.remove();
+        });
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+
+        for (let [key, value] of formData.entries()) {
+          if (value && value !== "Сначала выберите предприятие") {
+            params.set(key, value);
+          }
+        }
+
+        if (reportType.value === "salary") {
+          params.delete("carId"); // Убираем carId для зарплатного отчёта
+        }
+
+        // Перенаправление с параметрами
+        window.location.href = form.action.split("?")[0] + "?" + params.toString();
+      });
+    });
+  </script>
+</head>
+<body>
+
+<h2>Отчёты</h2>
+
+<form id="reportForm" method="GET" action="/api/reports/mileage">
+  <label for="reportType">Тип отчёта:</label>
+  <select id="reportType" name="type">
+    <option value="mileage">Пробег за период</option>
+    <option value="salary">Зарплата водителей</option>
+  </select><br><br>
+
+  <!-- Блок "Пробег за период" -->
+  <div id="mileageReport">
+    <label for="mileageEnterprise">Предприятие:</label>
+    <select id="mileageEnterprise" name="enterpriseId" onchange="loadCarsForMileage()">
+      <option value="">-- Выберите --</option>
+      <option th:each="enterprise : ${enterprises}" th:value="${enterprise.enterpriseId}" th:text="${enterprise.enterpriseName}"></option>
+    </select><br>
+
+    <label for="mileageCar">Машина:</label>
+    <select id="mileageCar" name="carId">
+      <option>Сначала выберите предприятие</option>
+    </select><br>
+
+    <label for="mileageStartDate">Дата начала:</label>
+    <input type="datetime-local" id="mileageStartDate" name="startDate"><br>
+
+    <label for="mileageEndDate">Дата окончания:</label>
+    <input type="datetime-local" id="mileageEndDate" name="endDate"><br>
+
+    <label for="mileagePeriod">Период:</label>
+    <select id="mileagePeriod" name="period">
+      <option value="day">День</option>
+      <option value="month">Месяц</option>
+      <option value="year">Год</option>
+    </select><br>
+  </div>
+
+  <!-- Блок "Зарплата водителей" -->
+  <div id="salaryReport" style="display:none;">
+    <label for="salaryEnterprise">Предприятие:</label>
+    <select id="salaryEnterprise" name="enterpriseId">
+      <option value="">-- Выберите --</option>
+      <option th:each="enterprise : ${enterprises}" th:value="${enterprise.enterpriseId}" th:text="${enterprise.enterpriseName}"></option>
+    </select><br>
+
+    <label for="salaryStartDate">Дата начала:</label>
+    <input type="datetime-local" id="salaryStartDate" name="startDate"><br>
+
+    <label for="salaryEndDate">Дата окончания:</label>
+    <input type="datetime-local" id="salaryEndDate" name="endDate"><br>
+
+    <label for="salaryPeriod">Период:</label>
+    <select id="salaryPeriod" name="period">
+      <option value="day">День</option>
+      <option value="month">Месяц</option>
+      <option value="year">Год</option>
+    </select><br>
+  </div>
+
+  <button type="submit">Сформировать отчёт</button>
+</form>
+
+<!-- Ссылка обратно к списку предприятий -->
+<a href="/assignedEnterprises">Назад к предприятиям</a>
+
+</body>
+</html>

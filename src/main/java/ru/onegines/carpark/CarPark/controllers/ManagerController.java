@@ -103,6 +103,13 @@ public class ManagerController {
         return "managers/assignedEnterprises";
     }
 
+    @GetMapping("/reports")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public String showReportsPage(Model model) {
+        model.addAttribute("enterprises", enterpriseService.getAllEnterprises());
+        return "managers/reports";
+    }
+
     @GetMapping("/{managerId}/enterprises/{enterpriseId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showEnterpriseCars(@PathVariable UUID managerId,

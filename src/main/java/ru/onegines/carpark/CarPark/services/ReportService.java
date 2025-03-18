@@ -6,15 +6,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.onegines.carpark.CarPark.dto.ReportDTO;
 import ru.onegines.carpark.CarPark.models.Car;
+import ru.onegines.carpark.CarPark.models.Driver;
 import ru.onegines.carpark.CarPark.models.Enterprise;
 import ru.onegines.carpark.CarPark.models.RoutePoint;
 import ru.onegines.carpark.CarPark.repositories.CarRepository;
+import ru.onegines.carpark.CarPark.repositories.DriverRepository;
+import ru.onegines.carpark.CarPark.repositories.EnterpriseRepository;
 import ru.onegines.carpark.CarPark.repositories.RoutePointRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +30,8 @@ import java.util.stream.Collectors;
 public class ReportService {
     private final RoutePointRepository routePointRepository;
     private final CarRepository carRepository;
+    private final EnterpriseRepository enterpriseRepository;
+    private final DriverRepository driverRepository;
     private final RestTemplate restTemplate;
     private static final String ORS_API_URL = "https://api.openrouteservice.org/v2/directions/driving-car/json";
     @Value("${openrouteservice.api.key}")
@@ -33,14 +39,16 @@ public class ReportService {
     private static final Logger log = LoggerFactory.getLogger(ReportService.class);
 
 
-    public ReportService(RoutePointRepository routePointRepository, CarRepository carRepository, RestTemplate restTemplate) {
+    public ReportService(RoutePointRepository routePointRepository, CarRepository carRepository, EnterpriseRepository enterpriseRepository, DriverRepository driverRepository, RestTemplate restTemplate) {
         this.routePointRepository = routePointRepository;
         this.carRepository = carRepository;
+        this.enterpriseRepository = enterpriseRepository;
+        this.driverRepository = driverRepository;
         this.restTemplate = restTemplate;
     }
 
 
-    public ReportDTO calculateMileage(UUID carId, LocalDateTime start, LocalDateTime end, String period) {
+    public ReportDTO calculateMileage(UUID carId, UUID id, LocalDateTime start, LocalDateTime end, String period) {
         // 1. Получаем машину и её предприятие
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена: " + carId));
@@ -49,45 +57,40 @@ public class ReportService {
             throw new IllegalArgumentException("Предприятие не найдено для машины: " + carId);
         }
 
-        // 2. Получаем таймзону предприятия
-        ZoneId enterpriseZone = ZoneId.of(enterprise.getTimeZone());  // Например, "Europe/Moscow"
+        // 2. Определяем таймзону предприятия
+        ZoneId enterpriseZone = ZoneId.of(enterprise.getTimeZone());
 
-        // 3. Переводим start и end в таймзону предприятия
-        ZonedDateTime startEnterpriseTime = start.atZone(enterpriseZone);  // 2024-02-01T00:00:00+03:00
-        ZonedDateTime endEnterpriseTime = end.atZone(enterpriseZone).with(LocalTime.MAX); // 2024-02-28T23:59:59+03:00
+        // 3. Приводим start и end в нужную таймзону
+        ZonedDateTime startUtc = start.atZone(enterpriseZone).withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime endUtc = end.atZone(enterpriseZone).with(LocalTime.MAX).withZoneSameInstant(ZoneOffset.UTC);
 
-        // 4. Конвертируем в UTC для запроса в БД
-        ZonedDateTime startUtc = startEnterpriseTime.withZoneSameInstant(ZoneOffset.UTC); // 2024-01-31T21:00:00+00:00
-        ZonedDateTime endUtc = endEnterpriseTime.withZoneSameInstant(ZoneOffset.UTC);     // 2024-02-28T20:59:59+00:00
-
-
-        // 5. Запрашиваем точки маршрута с корректным UTC-интервалом
+        // 4. Получаем точки маршрута
         log.debug("Запрос в БД: carId={}, startUtc={}, endUtc={}", carId, startUtc, endUtc);
-        List<RoutePoint> points = routePointRepository.findByCarIdAndTimestampUtcBetween(
-                carId,
-                startUtc.withZoneSameInstant(ZoneOffset.UTC), // ZonedDateTime в UTC
-                endUtc.withZoneSameInstant(ZoneOffset.UTC)
-        );
+        List<RoutePoint> points = routePointRepository.findByCarIdAndTimestampUtcBetween(carId, startUtc, endUtc);
 
         if (points.isEmpty()) {
             throw new IllegalArgumentException("Нет данных за этот период");
         }
 
-        // 6. Формируем список координат
+        // 5. Формируем список координат
         List<List<Double>> coordinates = points.stream()
                 .sorted(Comparator.comparing(RoutePoint::getTimestampUtc))
                 .map(p -> List.of(p.getPoint().getX(), p.getPoint().getY()))  // Долгота, широта
                 .collect(Collectors.toList());
 
-        // 7. Запрос в OpenRouteService
+        // 6. Получаем пробег через OpenRouteService
         Double totalDistance = getDistanceFromORS(coordinates);
 
-        // 8. Группируем пробег в таймзоне предприятия
+        // 7. Группируем пробег по периоду
         Map<LocalDate, Double> mileageByPeriod = groupByPeriod(points, totalDistance, period, enterpriseZone);
 
-        // 9. Возвращаем результат
-        return new ReportDTO("Пробег за период", period, start, end, mileageByPeriod);
+        // 8. Вычисляем общий пробег
+        double totalMileage = mileageByPeriod.values().stream().mapToDouble(Double::doubleValue).sum();
+
+        // 9. Формируем DTO
+        return new ReportDTO("Пробег за период", period, start, end, mileageByPeriod, totalMileage);
     }
+
 
 
     private Map<LocalDate, Double> groupByPeriod(List<RoutePoint> points, Double totalDistance, String period, ZoneId timezone) {
@@ -140,5 +143,40 @@ public class ReportService {
         }
         return grouped;
     }
+
+    public ReportDTO calculateSalary(UUID enterpriseId, LocalDateTime start, LocalDateTime end, String period) {
+        Enterprise enterprise = enterpriseRepository.findById(enterpriseId)
+                .orElseThrow(() -> new IllegalArgumentException("Предприятие не найдено: " + enterpriseId));
+
+        List<Driver> drivers = driverRepository.findByEnterpriseId(enterpriseId);
+
+        if (drivers.isEmpty()) {
+            throw new IllegalArgumentException("Водители не найдены для предприятия: " + enterpriseId);
+        }
+
+        // Получаем количество месяцев в выбранном диапазоне
+        long monthsInPeriod = ChronoUnit.MONTHS.between(
+                start.withDayOfMonth(1),
+                end.withDayOfMonth(1)
+        ) + 1;
+
+        // Распределяем зарплату водителей по месяцам
+        Map<LocalDate, Double> salaryByPeriod = new TreeMap<>();
+        double totalSalary = 0.0;
+
+        for (Driver driver : drivers) {
+            double monthlySalary = driver.getSalary();
+            totalSalary += monthlySalary * monthsInPeriod;
+
+            LocalDate current = start.toLocalDate().withDayOfMonth(1);
+            for (int i = 0; i < monthsInPeriod; i++) {
+                salaryByPeriod.put(current, salaryByPeriod.getOrDefault(current, 0.0) + monthlySalary);
+                current = current.plusMonths(1);
+            }
+        }
+
+        return new ReportDTO("Зарплата водителей", period, start, end, salaryByPeriod, totalSalary);
+    }
+
 }
 

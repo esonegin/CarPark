@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Отчёт</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h1 th:text="${reportType}"></h1>
+
+<p><strong>Период:</strong> <span th:text="${report.period}"></span></p>
+<p><strong>С даты:</strong> <span th:text="${#temporals.format(report.startDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+<p><strong>По дату:</strong> <span th:text="${#temporals.format(report.endDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>Дата</th>
+    <th>Значение</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="entry : ${report.result}">
+    <td th:text="${entry.key}"></td>
+    <td th:text="${#numbers.formatDecimal(entry.value, 1, 2)}"></td>
+  </tr>
+  </tbody>
+</table>
+
+<p><strong>Общий итог:</strong> <span th:text="${#numbers.formatDecimal(report.totalMileage, 1, 2)}"></span></p>
+
+<a href="/managers/reports">Назад</a>
+</body>
+</html>
