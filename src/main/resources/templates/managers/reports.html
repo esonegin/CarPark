@@ -32,6 +32,7 @@
       const form = document.getElementById("reportForm");
       const reportType = document.getElementById("reportType");
 
+      // Переключение типа отчёта
       reportType.addEventListener("change", function () {
         const type = this.value;
         document.getElementById("mileageReport").style.display = type === "mileage" ? "block" : "none";
@@ -39,32 +40,31 @@
         form.action = type === "salary" ? "/api/reports/salary" : "/api/reports/mileage";
       });
 
+      // Фильтрация и отправка формы
       form.addEventListener("submit", function (event) {
-        event.preventDefault(); // Останавливаем стандартную отправку формы
+        event.preventDefault();
+
+        // Удаляем скрытые поля перед отправкой
+        document.querySelectorAll("select, input").forEach(el => {
+          if (el.closest("div[style='display:none;']")) el.remove();
+        });
 
         const formData = new FormData(form);
         const params = new URLSearchParams();
 
-        // Фильтруем только непустые значения и корректные параметры
         for (let [key, value] of formData.entries()) {
           if (value && value !== "Сначала выберите предприятие") {
-            params.delete(key); // Удаляем возможные дубликаты перед установкой
             params.set(key, value);
           }
         }
 
-        // Удаляем ненужные параметры в зависимости от типа отчёта
         if (reportType.value === "salary") {
           params.delete("carId"); // Убираем carId для зарплатного отчёта
         }
 
-        // Формируем чистый URL
-        const newAction = form.action.split("?")[0] + "?" + params.toString();
-        window.location.href = newAction;
+        // Перенаправление с параметрами
+        window.location.href = form.action.split("?")[0] + "?" + params.toString();
       });
-
-
-
     });
   </script>
 </head>

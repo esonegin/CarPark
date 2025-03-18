@@ -48,7 +48,7 @@ public class ReportService {
     }
 
 
-    public ReportDTO calculateMileage(UUID carId, LocalDateTime start, LocalDateTime end, String period) {
+    public ReportDTO calculateMileage(UUID carId, UUID id, LocalDateTime start, LocalDateTime end, String period) {
         // 1. Получаем машину и её предприятие
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new IllegalArgumentException("Машина не найдена: " + carId));

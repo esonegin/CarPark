@@ -3,6 +3,7 @@ package ru.onegines.carpark.CarPark.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,33 +20,46 @@ import java.util.UUID;
  * @author onegines
  * @date 05.03.2025
  */
-@RestController
+@Controller
 @RequestMapping("/api/reports")
 public class ReportController {
     private final ReportService reportService;
-    private final EnterpriseService enterpriseService;
 
     @Autowired
-    public ReportController(ReportService reportService, EnterpriseService enterpriseService) {
+    public ReportController(ReportService reportService) {
         this.reportService = reportService;
-        this.enterpriseService = enterpriseService;
-    }
-
-    @GetMapping("/mileage")
-    public ResponseEntity<ReportDTO> getMileageReport(
-            @RequestParam UUID carId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam String period) {
-        return ResponseEntity.ok(reportService.calculateMileage(carId, startDate, endDate, period));
     }
 
     @GetMapping("/salary")
-    public ResponseEntity<ReportDTO> getSalaryReport(
-            @RequestParam UUID enterpriseId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam String period) {
-        return ResponseEntity.ok(reportService.calculateSalary(enterpriseId, startDate, endDate, period));
+    public String getSalaryReport(@RequestParam UUID enterpriseId,
+                                  @RequestParam String startDate,
+                                  @RequestParam String endDate,
+                                  @RequestParam String period,
+                                  Model model) {
+        ReportDTO report = reportService.calculateSalary(enterpriseId,
+                LocalDateTime.parse(startDate),
+                LocalDateTime.parse(endDate),
+                period);
+
+        model.addAttribute("reportType", "Зарплата водителей");
+        model.addAttribute("report", report);
+        return "managers/reportResult";
+    }
+
+    @GetMapping("/mileage")
+    public String getMileageReport(@RequestParam UUID enterpriseId,
+                                   @RequestParam UUID carId,
+                                   @RequestParam String startDate,
+                                   @RequestParam String endDate,
+                                   @RequestParam String period,
+                                   Model model) {
+        ReportDTO report = reportService.calculateMileage(carId, enterpriseId,
+                LocalDateTime.parse(startDate),
+                LocalDateTime.parse(endDate),
+                period);
+
+        model.addAttribute("reportType", "Пробег автомобиля");
+        model.addAttribute("report", report);
+        return "managers/reportResult";
     }
 }
